@@ -16,12 +16,14 @@ function ChatArea(props) {
   }, [message]);
 
   const handleSendMessage = () => {
-    const data = new FormData();
+    if (selectedFile) {
+      const data = new FormData();
 
-    for (let i = 0; i < selectedFile.length; i++) {
-      data.append("file", selectedFile[i]);
+      for (let i = 0; i < selectedFile.length; i++) {
+        data.append("file", selectedFile[i]);
+      }
+      uploadImage(data);
     }
-    uploadImage(data);
     if (fieldMsg && fieldMsg.length) {
       sendMessage({
         msg: fieldMsg,

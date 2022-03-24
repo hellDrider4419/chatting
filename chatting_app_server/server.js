@@ -76,8 +76,7 @@ app.use(async function (req, res) {
       upload(req, res, (err) => {
         if (err) {
           result = { error: err };
-        }
-        result = "success";
+        } else result = "success";
       });
 
       break;
@@ -95,7 +94,7 @@ io.on("connection", (socket) => {
 
   // Listen for new messages
   socket.on(NEW_CHAT_MESSAGE_EVENT, (data) => {
-    AddNewMessage(data).then((res) =>
+    AddNewMessage(data.body).then((res) =>
       io.in(roomId).emit(NEW_CHAT_MESSAGE_EVENT, res)
     );
   });
