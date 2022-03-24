@@ -1,0 +1,456 @@
+* {
+  margin: 0px;
+  padding: 0px;
+  color: white;
+  user-select: none;
+}
+
+body {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+.displayFlexCenter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.wh_100 {
+  width: 100%;
+  height: 100%;
+}
+.contactArea {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: start;
+  height: 100%;
+  width: 400px;
+  min-width: 200px;
+  border-right: 1px solid black;
+  background-color: #1a1a1a;
+}
+.chatArea {
+  height: 100%;
+  width: inherit;
+  background-color: #212121;
+}
+
+.dir_Row {
+  flex-direction: row;
+}
+
+.contact-header {
+  width: 100%;
+  background-color: #00000048;
+  height: 10%;
+}
+.profile-img {
+  height: 50px;
+  width: 50px;
+  background-image: url("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRwTlixxP6yDF_GnOfsa41QX2Z5GXRdnC0-qA&usqp=CAU");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  border: 3px inset #2c0b79;
+  border-radius: 50%;
+}
+
+.profile-info {
+  width: 70%;
+  margin-left: 10px;
+}
+.info-name {
+}
+.info-des {
+  overflow: hidden;
+  word-wrap: break-word;
+  height: 20px;
+  width: 100%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.contact-search {
+  width: 100%;
+  height: 60px;
+  border-bottom: 1px solid #242424;
+}
+
+.search-bar {
+  overflow: hidden;
+  width: 71%;
+  line-height: 1.4;
+  border-radius: 20px;
+  padding: 5px;
+  color: grey;
+  background-color: #82828233;
+}
+.fa-search {
+  font-size: 22px !important;
+  padding-bottom: 3px;
+  margin-left: 10px;
+  color: #b1b1b1;
+}
+
+.contact-container {
+  width: 92%;
+  padding: 0px 2%;
+  height: 58px;
+  margin: 4px 2%;
+  border-bottom: 1px solid grey;
+  border-radius: 5px;
+}
+.contact-profile,
+.person-profile {
+  box-shadow: 3px 3px 5px #000000;
+
+  height: 40px;
+  position: relative;
+  width: 40px;
+  background-image: url("https://static.vecteezy.com/packs/media/components/global/search-explore-nav/img/vectors/term-bg-1-666de2d941529c25aa511dc18d727160.jpg");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  /* border: 3px inset rgb(44, 11, 121); */
+  border-radius: 50%;
+  background-blend-mode: overlay;
+  background-color: #0000004d;
+}
+.contact-status {
+  height: 8px;
+  width: 8px;
+  border-radius: 50%;
+  position: absolute;
+  bottom: 1px;
+  right: 1px;
+  border: 2px solid #2c3039;
+  background-color: #04fc04;
+}
+.contact-details {
+  width: 77%;
+  margin-left: 10px;
+}
+.contact-name {
+  text-transform: capitalize;
+  font-size: 16px;
+}
+
+.contact-msg {
+  justify-content: start;
+  color: #878787;
+  font-size: 12px;
+}
+
+.contact-menu {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.menu-icon {
+  margin-left: 5px;
+  color: #a7a7a7;
+}
+.contact-time-menu {
+  color: #9d9d9d;
+  font-size: 12px;
+}
+.msg-icon {
+  color: #898989;
+  margin-right: 5px;
+}
+.recent-contact-footer {
+  color: #595b5e;
+  padding: 5px 40px;
+  border-top: 1px solid #1191a2;
+  text-align: center;
+}
+.recent-contact {
+  width: 100%;
+}
+.chat-header {
+  padding: 0% 2%;
+  width: 96%;
+  justify-content: space-between;
+  height: 10%;
+  background-color: #0e0e0e;
+}
+
+.person-profile-info {
+  margin-left: 10px;
+  align-items: center;
+  justify-content: space-between;
+  display: flex;
+  width: 80%;
+}
+.person-profile-name {
+  font-size: 18px;
+  color: #d5d5d5;
+}
+
+.person-profile-des,
+.person-profile-last-seen {
+  color: #9d9d9d;
+}
+
+.chat-body {
+  overflow-y: scroll;
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: start;
+  flex-direction: column;
+  height: 80%;
+  padding-bottom: 10px;
+}
+.msg-recieved {
+  margin: 10px 0px 0px 10px;
+  max-width: 60%;
+  border-radius: 0px 8px 8px 8px;
+  background-color: #ffffff0d;
+  box-shadow: 0px 0px 6px #00000036;
+  padding: 8px;
+  align-self: flex-start;
+  color: #cfcfcf;
+  user-select: text;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.msg-sent {
+  margin: 10px 10px 0px 0px;
+  max-width: 60%;
+  border-radius: 8px 0px 8px 8px;
+  box-shadow: 0px 0px 6px #00000036;
+  padding: 8px;
+  align-self: flex-end;
+  color: #cfcfcf;
+  user-select: text;
+  background-color: #ffffff0d;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+.msg-time {
+  font-size: 9px;
+  color: #bababa;
+}
+.chat-body::-webkit-scrollbar {
+  display: none;
+}
+.type-area {
+  box-shadow: 0px 0px 6px black;
+  height: 8%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0px 10px;
+}
+
+.text-area {
+  height: 80%;
+  width: 90%;
+  margin-left: 10px;
+  display: flex;
+  justify-content: center;
+  padding: 0px 10px;
+
+  align-items: center;
+  border-radius: 30px;
+  background-color: #ffffff21;
+}
+.other-option {
+  text-align: center;
+  font-size: 26px !important;
+  color: white;
+}
+.send-icon {
+  font-size: 24px !important;
+  margin-left: 10px;
+}
+.msg-to-type {
+  width: -webkit-fill-available;
+  margin-left: 5px;
+  background-color: #00000000;
+  outline: none;
+  border: #00000000;
+}
+.msg-to-type:hover,
+.msg-to-type:focus-visible {
+  background-color: #00000000;
+  outline: none;
+  border: #00000000;
+}
+
+.login {
+  width: 100%;
+  height: 100vh;
+  background-position: center;
+  background-blend-mode: overlay;
+  background-repeat: no-repeat;
+  background-color: #1c1c1c;
+  background-size: cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.login-popup {
+  background-position: center;
+  background-blend-mode: overlay;
+  background-repeat: no-repeat;
+  border-radius: 12px;
+  background-size: cover;
+  width: 70%;
+  height: 75%;
+  box-shadow: 0px 0px 30px 0px #000000;
+  background-color: #292727;
+}
+.form {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  border-radius: 12px;
+}
+.input {
+  margin: 7px;
+  width: 60%;
+  color: #fffefe;
+  height: 40px;
+  background-color: #15151500;
+  border-color: #5f5f5f;
+  border-radius: 5px;
+  border-width: 1px;
+  box-shadow: 0 0 30px 0px #000000bf;
+  text-align: center;
+}
+.input:focus-visible {
+  outline: none;
+}
+
+.login-des {
+  font-size: small;
+  font-style: italic;
+  margin: 20px 10px 10px 10px;
+  color: #fffefe;
+}
+
+.signup-button {
+  border-radius: 5px;
+  margin-top: 10px;
+  width: 20%;
+  height: 30px;
+  border: 1px inset #5a4f4f;
+  background-color: #222222;
+  box-shadow: #000000 0px 0px 20px 0px;
+}
+.input:-webkit-autofill,
+.input:-webkit-autofill:hover,
+.input:-webkit-autofill:focus,
+.input:-webkit-autofill:active {
+  -webkit-text-fill-color: #fffefe;
+  -webkit-box-shadow: 0 0 0 30px #292727 inset, 0 0 30px 0 #000000bf;
+}
+
+.signupRoutes {
+  margin-top: 10px;
+  font-size: 11px;
+  color: aqua;
+  cursor: pointer;
+}
+
+.profile_page {
+  height: 100%;
+  display: flex;
+  width: 100%;
+  background-color: #242424;
+  align-items: center;
+  justify-content: center;
+}
+.innerContainer {
+  width: 75%;
+  height: 75%;
+  background-color: #343434;
+  box-shadow: 0px 0px 30px 0px black;
+  display: flex;
+  align-items: center;
+  border-radius: 8px;
+  justify-content: space-between;
+  flex-direction: column;
+  padding: 5%;
+}
+
+.profileImage {
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background-image: url();
+  background-color: #69ff8b57;
+  box-shadow: 0px 0px 30px 0px black;
+}
+
+.des_heading {
+  color: #3cff6e;
+  font-size: 20px;
+  font-family: cursive;
+}
+
+.des_field {
+  width: 80%;
+  min-height: 30px;
+  border-bottom: 1px solid white;
+}
+.save_profile_Image_btn {
+  padding: 0px 5px 3px 5px;
+  background-color: #39ff6e;
+  width: 150px;
+  color: #000000;
+  text-align: center;
+  font-family: cursive;
+  font-size: 20px;
+  box-shadow: 0px 0px 15px 0px #000000;
+  border-radius: 4px;
+}
+
+.selected-tab {
+  background: #2f2f2f;
+  box-shadow: 0px 0px 7px 0px #00d9ff;
+  color: #ffffff !important;
+  border-radius: 5px;
+}
+
+.tabs {
+  padding: 3% 4%;
+  margin: 2% 0px;
+  color: #919191;
+  font-size: 11px;
+  font-family: cursive;
+}
+.contact-tab {
+  width: 100%;
+  border-bottom: 1px solid #242424;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
+.hw25 {
+  height: 25px !important;
+  width: 25px !important;
+}
+
+.h40 {
+  height: 40px;
+}
+
+.selected-contact {
+  background-color: #839acd2b;
+}
+.msg-date {
+  padding: 4px;
+  font-size: 11px;
+  color: #a3a1a1;
+  box-shadow: 0px 0px 5px black;
+  border-radius: 6px;
+}
