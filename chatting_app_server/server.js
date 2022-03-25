@@ -1,6 +1,5 @@
 const express = require("express");
 const app = express();
-const multer = require("multer");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const {
@@ -12,6 +11,7 @@ const {
   GetAllUserListquery,
   GetUserRoomIDsQuery,
 } = require("./pgconfig");
+const { uploadFiles } = require("./saveFiles");
 const server = require("http").createServer(app);
 const io = require("socket.io")(server, {
   cors: {
@@ -40,17 +40,6 @@ app.use(
   })
 );
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "public");
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + "-" + file.originalname);
-  },
-});
-
-const upload = multer({ storage }).array("file");
-
 app.use(async function (req, res) {
   let result = "";
   switch (req.url) {
@@ -72,13 +61,8 @@ app.use(async function (req, res) {
     case "/getUserRoomList":
       result = await GetUserRoomIDsQuery(req.body);
       break;
-    case "/uploadImage":
-      upload(req, res, (err) => {
-        if (err) {
-          result = { error: err };
-        } else result = "success";
-      });
-
+    case "/updateAbout":
+      result = await GetUserRoomIDsQuery(req.body);
       break;
     default:
       result = "url not found";
@@ -94,10 +78,17 @@ io.on("connection", (socket) => {
 
   // Listen for new messages
   socket.on(NEW_CHAT_MESSAGE_EVENT, (data) => {
+    data.body.file = data.body.file.map((file) => uploadFiles(file));
     AddNewMessage(data.body).then((res) =>
       io.in(roomId).emit(NEW_CHAT_MESSAGE_EVENT, res)
     );
   });
+
+  // socket.on("updatedProfileInfo", (data) => {
+  //   console.log(data.body);
+  //   io.emit("updatedProfileInfo", data.body);
+  //   // AddNewMessage(data.body).then((res) => io.emit("updatedProfileInfo", res));
+  // });
 
   // Leave the room if the user closes the socket
   socket.on("disconnect", () => {

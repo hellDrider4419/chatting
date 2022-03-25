@@ -144,8 +144,8 @@ const CreateNewRoomQuery = async (args) => {
 const AddNewMessage = async (args) => {
   try {
     const result =
-      await client.query(`INSERT INTO messages(roomid, userid, message, time, type)
-	VALUES (${args.roomid}, ${args.userid}, '${args.msg}', '${args.time}', '${args.type}') returning *`);
+      await client.query(`INSERT INTO messages(roomid, userid, message, time, images)
+	VALUES (${args.roomid}, ${args.userid}, '${args.msg}', '${args.time}', '{${args.file}}') returning *`);
     return result.rows[0];
   } catch (err) {
     console.log(`addNewMessage`, err);

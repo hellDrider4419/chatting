@@ -16,21 +16,17 @@ function ChatArea(props) {
   }, [message]);
 
   const handleSendMessage = () => {
-    if (selectedFile) {
-      const data = new FormData();
-
-      for (let i = 0; i < selectedFile.length; i++) {
-        data.append("file", selectedFile[i]);
+    if ((fieldMsg && fieldMsg.length) || selectedFile) {
+      let files = [];
+      for (let i = 0; i < selectedFile?.length; i++) {
+        files.push({ file: selectedFile[i], name: selectedFile[i].name });
       }
-      uploadImage(data);
-    }
-    if (fieldMsg && fieldMsg.length) {
       sendMessage({
         msg: fieldMsg,
         time: moment().format(),
         userid: props.userInfo.userid,
-        type: "text",
         roomid: props.roomDetails.roomid,
+        file: files,
       });
 
       setfieldMsg("");
@@ -89,6 +85,12 @@ function ChatArea(props) {
                         : "msg-recieved"
                     }
                   >
+                    {msg.images.map((e) => (
+                      <img
+                        className="files"
+                        src={`http://localhost:4000/images/${e}`}
+                      />
+                    ))}
                     {msg.message}
                     <div className="msg-time">
                       {moment(msg.time).format("hh:mm")}
