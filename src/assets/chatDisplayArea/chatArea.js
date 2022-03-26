@@ -3,8 +3,6 @@ import { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import { addNewMessage, setSelectedRoom } from "../reactRedux/initialSlice";
 import useChat from "./useChat";
-import ScrollToBottom from "react-scroll-to-bottom";
-import { uploadImage } from "../../apiCalls/chatApiCall";
 
 function ChatArea(props) {
   const { message, sendMessage } = useChat(props.roomDetails.roomid);

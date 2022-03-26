@@ -1,3 +1,4 @@
+const multer = require("multer");
 const express = require("express");
 const app = express();
 const cors = require("cors");
@@ -10,6 +11,7 @@ const {
   CreateNewRoomQuery,
   GetAllUserListquery,
   GetUserRoomIDsQuery,
+  updateAboutQuery,
 } = require("./pgconfig");
 const { uploadFiles } = require("./saveFiles");
 const server = require("http").createServer(app);
@@ -39,6 +41,19 @@ app.use(
     type: "application/x-www-form-urlencoded",
   })
 );
+var storage = multer.diskStorage({
+  destination: "public/",
+  filename: function (req, file, cb) {
+    cb(null, `${Date.now()}-${file.originalname}`);
+  },
+});
+
+var upload = multer({ storage: storage });
+app.post("/updateAbout", upload.array("files"), function (req, res) {
+  req.body.profilePic = req.files[0].filename;
+  updateAboutQuery(req.body);
+  res.send("updated");
+});
 
 app.use(async function (req, res) {
   let result = "";
@@ -59,9 +74,6 @@ app.use(async function (req, res) {
       result = await GetAllUserListquery(req.body);
       break;
     case "/getUserRoomList":
-      result = await GetUserRoomIDsQuery(req.body);
-      break;
-    case "/updateAbout":
       result = await GetUserRoomIDsQuery(req.body);
       break;
     default:

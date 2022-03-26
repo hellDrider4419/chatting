@@ -21,7 +21,8 @@ export const createNewRoom = async (args) => {
   return result.data;
 };
 
-export const uploadImage = async (args) => {
-  const result = await axios.post(`${serverUrl}/uploadImage`, args);
+export const updateAbout = async (args) => {
+  console.log(args);
+  const result = await axios.post(`${serverUrl}/updateAbout`, args);
   return result.data;
 };

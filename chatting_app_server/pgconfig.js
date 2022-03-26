@@ -77,7 +77,7 @@ const loginQuery = async (args) => {
 const updateAboutQuery = async (args) => {
   try {
     const result = await client.query(
-      `update  userinfo  set description = '${args.desc}' where email = '${args.email}' returning *`
+      `update userinfo set description = '${args.des}', pofileimage= '${args.profilePic}' where userid = ${args.userid} returning *`
     );
 
     return result.rows[0];

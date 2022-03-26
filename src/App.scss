@@ -384,11 +384,18 @@ body {
 
 .profileImage {
   width: 300px;
+  background-position: center;
   height: 300px;
   border-radius: 50%;
-  background-image: url();
-  background-color: #69ff8b57;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-color: #00000057;
   box-shadow: 0px 0px 30px 0px black;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  font-family: ui-serif;
+  font-size: 30px;
 }
 
 .des_heading {
