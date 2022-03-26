@@ -59,7 +59,6 @@ const loginQuery = async (args) => {
     const result = await client.query(
       `select userid, password from  userinfo where email = '${args.email}'`
     );
-    console.log(result.rows);
     if (result.rowCount) {
       if (result.rows[0].password === args.password) {
         return result.rows[0] ? { userid: result.rows[0].userid } : {};

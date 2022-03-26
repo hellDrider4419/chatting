@@ -15,11 +15,32 @@ class ChatRoomList extends React.Component {
     return name;
   }
 
+  extractRoomProfile(room) {
+    let image = null;
+    if (room.userlist.length === 2) {
+      if (room.userlist[0] !== this.props.userInfo.userid) {
+        this.props.userList.forEach((e) => {
+          if (!image && e.userid === room.userlist[0]) {
+            image = e.pofileimage;
+          }
+        });
+      } else {
+        this.props.userList.forEach((e) => {
+          if (!image && e.userid === room.userlist[1]) {
+            image = e.pofileimage;
+          }
+        });
+      }
+    }
+    return `http://localhost:4000/images/${image}`;
+  }
+
   render() {
     return (
       <div className="recent-contact">
         {/* single chat box */}
         {this.props.roomList.map((item, i) => {
+          console.log(item);
           return (
             <div
               className="contact-container dir_Row displayFlexCenter"
@@ -32,7 +53,12 @@ class ChatRoomList extends React.Component {
                   : {}
               }
             >
-              <div className="contact-profile">
+              <div
+                className="contact-profile"
+                style={{
+                  backgroundImage: `url(${this.extractRoomProfile(item)})`,
+                }}
+              >
                 <div className="contact-status"></div>
               </div>
               <div className="contact-details">
@@ -86,6 +112,7 @@ const mapStateToProps = (state) => {
     roomList: state.initialSlice.roomList,
     userList: state.initialSlice.userList,
     selectedRoom: state.initialSlice.selectedRoom,
+    userInfo: state.initialSlice.userInfo,
   };
 };
 

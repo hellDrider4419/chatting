@@ -23,6 +23,13 @@ const io = require("socket.io")(server, {
 
 const PORT = 4000;
 const NEW_CHAT_MESSAGE_EVENT = "newChatMessage";
+let storage = multer.diskStorage({
+  destination: "public/images",
+  filename: function (req, file, cb) {
+    cb(null, `${Date.now()}-${file.originalname}`);
+  },
+});
+let upload = multer({ storage: storage });
 
 app.options(
   "*",
@@ -32,8 +39,6 @@ app.use(cors({ origin: "http://localhost:3000", optionsSuccessStatus: 200 }));
 app.use(
   bodyParser.json({ limit: 1024 * 1024 * 100, type: "application/json" })
 ); // to support JSON-encoded bodies
-
-app.use("/images", express.static("public"));
 app.use(
   bodyParser.urlencoded({
     extended: true,
@@ -41,46 +46,30 @@ app.use(
     type: "application/x-www-form-urlencoded",
   })
 );
-var storage = multer.diskStorage({
-  destination: "public/",
-  filename: function (req, file, cb) {
-    cb(null, `${Date.now()}-${file.originalname}`);
-  },
-});
 
-var upload = multer({ storage: storage });
+app.use("/images", express.static("public/images"));
+app.get("/getAllUserList", async function (req, res) {
+  res.send(await GetAllUserListquery(req.body));
+});
 app.post("/updateAbout", upload.array("files"), function (req, res) {
   req.body.profilePic = req.files[0].filename;
   updateAboutQuery(req.body);
   res.send("updated");
 });
-
-app.use(async function (req, res) {
-  let result = "";
-  switch (req.url) {
-    case "/addNewUser":
-      result = await SignupQuery(req.body);
-      break;
-    case "/loginUser":
-      result = await loginQuery(req.body);
-      break;
-    case "/createNewRoom":
-      result = await CreateNewRoomQuery(req.body);
-      break;
-    case "/getUserDetails":
-      result = await getUserDetailsQuery(req.body);
-      break;
-    case "/getAllUserList":
-      result = await GetAllUserListquery(req.body);
-      break;
-    case "/getUserRoomList":
-      result = await GetUserRoomIDsQuery(req.body);
-      break;
-    default:
-      result = "url not found";
-      break;
-  }
-  res.send(result);
+app.post("/addNewUser", async function (req, res) {
+  res.send(await SignupQuery(req.body));
+});
+app.post("/loginUser", async function (req, res) {
+  res.send(await loginQuery(req.body));
+});
+app.post("/createNewRoom", async function (req, res) {
+  res.send(await CreateNewRoomQuery(req.body));
+});
+app.post("/getUserDetails", async function (req, res) {
+  res.send(await getUserDetailsQuery(req.body));
+});
+app.post("/getUserRoomList", async function (req, res) {
+  res.send(await GetUserRoomIDsQuery(req.body));
 });
 
 io.on("connection", (socket) => {

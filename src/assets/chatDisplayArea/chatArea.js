@@ -8,6 +8,7 @@ function ChatArea(props) {
   const { message, sendMessage } = useChat(props.roomDetails.roomid);
   const [fieldMsg, setfieldMsg] = useState("");
   const [selectedFile, setSelectedFile] = useState();
+  const [roomUSerInfo, setRoomUserInfo] = useState();
   useEffect(() => {
     message &&
       props.addNewMessage({ message, roomid: props.roomDetails.roomid });
@@ -30,6 +31,18 @@ function ChatArea(props) {
       setfieldMsg("");
     }
   };
+  useEffect(() => {
+    if (props.roomDetails?.userlist?.length === 2) {
+      props.userList.forEach((e) => {
+        if (
+          e.userid === props.roomDetails.userlist[0] ||
+          e.userid === props.roomDetails.userlist[1]
+        ) {
+          setRoomUserInfo(e);
+        }
+      });
+    }
+  }, [props.userList, props.roomDetails]);
 
   return (
     <>
@@ -44,15 +57,22 @@ function ChatArea(props) {
         }}
       >
         <div className="chat-header displayFlexCenter">
-          <div className="person-profile"></div>
+          <div
+            className="person-profile"
+            style={{
+              backgroundImage: `url(http://localhost:4000/images/${roomUSerInfo?.pofileimage})`,
+            }}
+          ></div>
           <div className="person-profile-info">
             <div className="person-profile-name">
               {props.roomDetails.name}
-              <div className="person-profile-des">description of he thing</div>
+              <div className="person-profile-des">
+                {roomUSerInfo?.description}
+              </div>
             </div>
-            <div className="person-profile-last-seen">
+            {/* <div className="person-profile-last-seen">
               last active : 10:30 pm
-            </div>
+            </div> */}
           </div>
           <div className="person-profile-menu">
             <i className="fa menu-icon fa-ellipsis-v" aria-hidden="true"></i>
@@ -156,6 +176,7 @@ const mapStateToProps = (state) => {
   return {
     selectedRoom: state.initialSlice.selectedRoom,
     userInfo: state.initialSlice.userInfo,
+    userList: state.initialSlice.userList,
   };
 };
 

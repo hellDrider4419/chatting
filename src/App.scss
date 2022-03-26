@@ -48,10 +48,9 @@ body {
 .profile-img {
   height: 50px;
   width: 50px;
-  background-image: url("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRwTlixxP6yDF_GnOfsa41QX2Z5GXRdnC0-qA&usqp=CAU");
   background-position: center;
   background-repeat: no-repeat;
-  background-size: contain;
+  background-size: cover;
   border: 3px inset #2c0b79;
   border-radius: 50%;
 }
@@ -108,7 +107,6 @@ body {
   height: 40px;
   position: relative;
   width: 40px;
-  background-image: url("https://static.vecteezy.com/packs/media/components/global/search-explore-nav/img/vectors/term-bg-1-666de2d941529c25aa511dc18d727160.jpg");
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;

@@ -37,7 +37,13 @@ class ChatDisplayArea extends React.Component {
     const userInfo = await getUserDetails({
       userid: localStorage.getItem("loginToken"),
     });
-    this.props.setUserInfo(userInfo);
+    if (userInfo.email) {
+      this.props.setUserInfo(userInfo);
+    } else {
+      localStorage.removeItem("loginToken");
+      history.push("/");
+      this.props.navigate("/");
+    }
 
     const userList = await getUserList({});
     this.props.setUserList(userList);
@@ -59,7 +65,12 @@ class ChatDisplayArea extends React.Component {
       <div className="main wh_100 displayFlexCenter">
         <div className="contactArea">
           <div className="contact-header dir_Row displayFlexCenter">
-            <div className="profile-img"></div>
+            <div
+              className="profile-img"
+              style={{
+                backgroundImage: `url(http://localhost:4000/images/${this.props.userInfo.pofileimage})`,
+              }}
+            ></div>
             <div className="profile-info">
               <div className="info-name">{this.props.userInfo.name}</div>
               <div className="info-des">{this.props.userInfo.description}</div>
