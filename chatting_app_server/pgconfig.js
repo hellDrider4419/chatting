@@ -102,7 +102,6 @@ const GetAllUserListquery = async () => {
       await client.query(`select description, lastseen, name, pofileimage, 
         userid from userinfo`);
 
-    console.log("data", result.rows);
     return result.rows;
   } catch (err) {
     console.log(`GetAllUserListquery`, err);
