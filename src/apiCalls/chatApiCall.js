@@ -22,7 +22,6 @@ export const createNewRoom = async (args) => {
 };
 
 export const updateAbout = async (args) => {
-  console.log(args);
   const result = await axios.post(`${serverUrl}/updateAbout`, args);
   return result.data;
 };

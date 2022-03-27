@@ -40,7 +40,6 @@ class ChatRoomList extends React.Component {
       <div className="recent-contact">
         {/* single chat box */}
         {this.props.roomList.map((item, i) => {
-          console.log(item);
           return (
             <div
               className="contact-container dir_Row displayFlexCenter"
@@ -75,21 +74,23 @@ class ChatRoomList extends React.Component {
                     ></i>
                   </div>
                 </div>
-                {/* <div className="contact-msg dir_Row displayFlexCenter">
+                <div className="contact-msg dir_Row displayFlexCenter">
                   <i
                     className="fa fa-commenting msg-icon"
                     aria-hidden="true"
                   ></i>
-                  {item?.messages[item.messages?.length - 1].message}
+                  {item?.messages?.length &&
+                    item?.messages[item?.messages?.length - 1].message}
                   <div
                     className="contact-time-menu"
                     style={{ marginLeft: "auto" }}
                   >
-                    {moment(
-                      item?.messages[item.messages?.length - 1].time
-                    ).format("HH:MM")}
+                    {item?.messages?.length &&
+                      moment(
+                        item?.messages[item?.messages?.length - 1].time
+                      ).format("HH:mm")}
                   </div>
-                </div> */}
+                </div>
               </div>
             </div>
           );

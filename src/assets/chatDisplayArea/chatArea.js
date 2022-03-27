@@ -14,6 +14,19 @@ function ChatArea(props) {
       props.addNewMessage({ message, roomid: props.roomDetails.roomid });
   }, [message]);
 
+  useEffect(() => {
+    if (props.roomDetails?.userlist?.length === 2) {
+      props.userList.forEach((e) => {
+        if (
+          e.userid === props.roomDetails.userlist[0] ||
+          e.userid === props.roomDetails.userlist[1]
+        ) {
+          setRoomUserInfo(e);
+        }
+      });
+    }
+  }, [props.userList, props.roomDetails]);
+
   const handleSendMessage = () => {
     if ((fieldMsg && fieldMsg.length) || selectedFile) {
       let files = [];
@@ -27,22 +40,10 @@ function ChatArea(props) {
         roomid: props.roomDetails.roomid,
         file: files,
       });
-
+      setSelectedFile("");
       setfieldMsg("");
     }
   };
-  useEffect(() => {
-    if (props.roomDetails?.userlist?.length === 2) {
-      props.userList.forEach((e) => {
-        if (
-          e.userid === props.roomDetails.userlist[0] ||
-          e.userid === props.roomDetails.userlist[1]
-        ) {
-          setRoomUserInfo(e);
-        }
-      });
-    }
-  }, [props.userList, props.roomDetails]);
 
   return (
     <>
@@ -80,7 +81,6 @@ function ChatArea(props) {
         </div>
         <div className="chat-body">
           <div className="initial-msg">stay secure with encryped messaging</div>
-          {console.log(props.roomDetails?.messages)}
           {props.roomDetails?.messages?.map((msg, i) => {
             if (msg?.message?.length) {
               return (
@@ -127,6 +127,7 @@ function ChatArea(props) {
             ></i>
           </label>
           <input
+            onClick={(e) => (e.target.value = "")}
             multiple
             id="fileInput"
             type="file"
