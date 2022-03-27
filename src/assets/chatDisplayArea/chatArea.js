@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import { addNewMessage, setSelectedRoom } from "../reactRedux/initialSlice";
 import useChat from "./useChat";
+import documentThumbnail from "../../images/docThumb.png";
 
 function ChatArea(props) {
   const { message, sendMessage } = useChat(props.roomDetails.roomid);
@@ -82,7 +83,7 @@ function ChatArea(props) {
         <div className="chat-body">
           <div className="initial-msg">stay secure with encryped messaging</div>
           {props.roomDetails?.messages?.map((msg, i) => {
-            if (msg?.message?.length) {
+            if (msg?.message?.length || msg?.images?.length) {
               return (
                 <>
                   {(i == 0 ||
@@ -102,13 +103,27 @@ function ChatArea(props) {
                         ? "msg-sent"
                         : "msg-recieved"
                     }
+                    onContextMenu={(e) => {
+                      e.preventDefault();
+                      console.log("Right click");
+                    }}
                   >
-                    {msg.images.map((e) => (
-                      <img
-                        className="files"
-                        src={`http://localhost:4000/images/${e}`}
-                      />
-                    ))}
+                    <div className="filesContainer">
+                      {msg?.images?.slice(0, 4)?.map((e) => (
+                        <img
+                          className={
+                            msg?.images?.length === 1
+                              ? "files"
+                              : "multiplefiles"
+                          }
+                          src={`http://localhost:4000/images/${e}`}
+                          onError={({ currentTarget }) => {
+                            currentTarget.onerror = null; // prevents looping
+                            currentTarget.src = documentThumbnail;
+                          }}
+                        />
+                      ))}
+                    </div>
                     {msg.message}
                     <div className="msg-time">
                       {moment(msg.time).format("hh:mm")}
@@ -120,7 +135,7 @@ function ChatArea(props) {
           })}
         </div>
         <div className="type-area">
-          <label for="fileInput">
+          <label htmlFor="fileInput">
             <i
               className="fa fa-superpowers other-option"
               aria-hidden="true"
