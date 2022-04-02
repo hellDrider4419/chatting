@@ -4,8 +4,8 @@ const client = new Client({
   host: `localhost`,
   user: `postgres`,
   port: 5432,
-  password: `1`,
-  database: `chatingApp`,
+  password: `root`,
+  database: `chattingapp`,
 });
 
 client.connect((err) => {
