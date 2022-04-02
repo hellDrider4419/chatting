@@ -40,6 +40,7 @@ const SignupQuery = async (args) => {
     }
   } catch (err) {
     console.log(`SignupQuery`, err);
+    return err;
   }
 };
 
