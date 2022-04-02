@@ -72,6 +72,7 @@ app.post("/updateAbout", upload.array("files"), function (req, res) {
   res.send("updated");
 });
 app.post("/addNewUser", async function (req, res) {
+  console.log("call recieved fo rnew user", req.body);
   res.send(await SignupQuery(req.body));
 });
 app.post("/loginUser", async function (req, res) {

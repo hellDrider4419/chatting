@@ -29,6 +29,7 @@ const SignupQuery = async (args) => {
     const UserAlreadyExist = await client.query(
       `select userid from  userinfo where email = '${args.email}'`
     );
+    console.log(args, UserAlreadyExist);
     if (UserAlreadyExist.rowCount) {
       return "user already exist, Please login";
     } else {
