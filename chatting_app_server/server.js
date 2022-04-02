@@ -30,25 +30,27 @@ let storage = multer.diskStorage({
   },
 });
 let upload = multer({ storage: storage });
-app.use(function (req, res, next) {
-  // Website you wish to allow to connect
-  res.setHeader("Access-Control-Allow-Origin", "https://chatapp.hopto.org");
+// app.use(function (req, res, next) {
+//   // Website you wish to allow to connect
+//   res.setHeader("Access-Control-Allow-Origin", "https://chatapp.hopto.org");
 
-  // Request methods you wish to allow
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, OPTIONS, PUT, PATCH, DELETE"
-  );
+//   // Request methods you wish to allow
+//   res.setHeader(
+//     "Access-Control-Allow-Methods",
+//     "GET, POST, OPTIONS, PUT, PATCH, DELETE"
+//   );
 
-  // Pass to next layer of middleware
-  next();
-});
+//   // Pass to next layer of middleware
+//   next();
+// });
 
-//app.options(
-//  "*",
-//  cors({ origin: "https://chatapp.hopto.org", optionsSuccessStatus: 200 })
-//);
-//app.use(cors({ origin: "https://chatapp.hopto.org", optionsSuccessStatus: 200 }));
+app.options(
+  "*",
+  cors({ origin: "https://chatapp.hopto.org", optionsSuccessStatus: 200 })
+);
+app.use(
+  cors({ origin: "https://chatapp.hopto.org", optionsSuccessStatus: 200 })
+);
 app.use(
   bodyParser.json({ limit: 1024 * 1024 * 100, type: "application/json" })
 ); // to support JSON-encoded bodies
