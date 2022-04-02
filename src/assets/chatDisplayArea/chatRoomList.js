@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import { setSelectedRoom } from "../reactRedux/initialSlice";
 import moment from "moment";
+import { serverUrl } from "../../config";
 
 class ChatRoomList extends React.Component {
   constructor(props) {
@@ -32,7 +33,7 @@ class ChatRoomList extends React.Component {
         });
       }
     }
-    return `http://localhost:4000/images/${image}`;
+    return `${serverUrl}/images/${image}`;
   }
 
   render() {

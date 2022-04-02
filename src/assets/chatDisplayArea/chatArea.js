@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 import { addNewMessage, setSelectedRoom } from "../reactRedux/initialSlice";
 import useChat from "./useChat";
 import documentThumbnail from "../../images/docThumb.png";
+import { serverUrl } from "../../config";
 
 function ChatArea(props) {
   const { message, sendMessage } = useChat(props.roomDetails.roomid);
@@ -62,7 +63,7 @@ function ChatArea(props) {
           <div
             className="person-profile"
             style={{
-              backgroundImage: `url(http://localhost:4000/images/${roomUSerInfo?.pofileimage})`,
+              backgroundImage: `url(${serverUrl}/images/${roomUSerInfo?.pofileimage})`,
             }}
           ></div>
           <div className="person-profile-info">
@@ -105,7 +106,10 @@ function ChatArea(props) {
                     }
                     onContextMenu={(e) => {
                       e.preventDefault();
-                      console.log("Right click");
+                      // console.log("Right click", {
+                      //   x: e.nativeEvent.offsetX,
+                      //   y: e.nativeEvent.offsetY,
+                      // });
                     }}
                   >
                     <div className="filesContainer">
@@ -116,7 +120,7 @@ function ChatArea(props) {
                               ? "files"
                               : "multiplefiles"
                           }
-                          src={`http://localhost:4000/images/${e}`}
+                          src={`${serverUrl}/images/${e}`}
                           onError={({ currentTarget }) => {
                             currentTarget.onerror = null; // prevents looping
                             currentTarget.src = documentThumbnail;
@@ -128,6 +132,7 @@ function ChatArea(props) {
                     <div className="msg-time">
                       {moment(msg.time).format("hh:mm")}
                     </div>
+                    {/* <Menu /> */}
                   </div>
                 </>
               );
@@ -197,3 +202,11 @@ const mapStateToProps = (state) => {
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ChatArea);
+
+function Menu(props) {
+  return (
+    <div>
+      <div>delete</div>
+    </div>
+  );
+}

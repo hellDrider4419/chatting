@@ -1,5 +1,5 @@
 import axios from "axios";
-const serverUrl = "http://localhost:4000";
+import { serverUrl } from "../config";
 
 export const getUserList = async () => {
   const result = await axios.get(`${serverUrl}/getAllUserList`);

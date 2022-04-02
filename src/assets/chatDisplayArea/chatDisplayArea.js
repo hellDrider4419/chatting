@@ -15,6 +15,7 @@ import {
   setUserInfo,
   setUserList,
 } from "../reactRedux/initialSlice";
+import { serverUrl } from "../../config";
 
 class ChatDisplayArea extends React.Component {
   constructor(props) {
@@ -68,7 +69,7 @@ class ChatDisplayArea extends React.Component {
             <div
               className="profile-img"
               style={{
-                backgroundImage: `url(http://localhost:4000/images/${this.props.userInfo.pofileimage})`,
+                backgroundImage: `url(${serverUrl}/images/${this.props.userInfo.pofileimage})`,
               }}
             ></div>
             <div className="profile-info">
