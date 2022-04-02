@@ -30,6 +30,19 @@ let storage = multer.diskStorage({
   },
 });
 let upload = multer({ storage: storage });
+app.use(function (req, res, next) {
+  // Website you wish to allow to connect
+  res.setHeader("Access-Control-Allow-Origin", "https://chatapp.hopto.org");
+
+  // Request methods you wish to allow
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, OPTIONS, PUT, PATCH, DELETE"
+  );
+
+  // Pass to next layer of middleware
+  next();
+});
 
 //app.options(
 //  "*",
