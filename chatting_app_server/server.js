@@ -33,9 +33,9 @@ let upload = multer({ storage: storage });
 
 app.options(
   "*",
-  cors({ origin: "http://localhost:3000", optionsSuccessStatus: 200 })
+  cors({ origin: "http://0.0.0.0:80", optionsSuccessStatus: 200 })
 );
-app.use(cors({ origin: "http://localhost:3000", optionsSuccessStatus: 200 }));
+app.use(cors({ origin: "http://0.0.0.0:80", optionsSuccessStatus: 200 }));
 app.use(
   bodyParser.json({ limit: 1024 * 1024 * 100, type: "application/json" })
 ); // to support JSON-encoded bodies
