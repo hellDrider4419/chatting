@@ -1,20 +1,31 @@
 import moment from "moment";
 import { useEffect, useState } from "react";
 import { connect } from "react-redux";
-import { addNewMessage, setSelectedRoom } from "../reactRedux/initialSlice";
+import {
+  addNewMessage,
+  deleteMessage,
+  setSelectedRoom,
+} from "../reactRedux/initialSlice";
 import useChat from "./useChat";
 import documentThumbnail from "../../images/docThumb.png";
 import { serverUrl } from "../../config";
 
 function ChatArea(props) {
-  const { message, sendMessage } = useChat(props.roomDetails.roomid);
+  const { message, deleteMessage, sendDeleteRequest, sendMessage } = useChat(
+    props.roomDetails.roomid
+  );
   const [fieldMsg, setfieldMsg] = useState("");
   const [selectedFile, setSelectedFile] = useState();
   const [roomUSerInfo, setRoomUserInfo] = useState();
+  const [menuDetails, setMenuDetails] = useState({});
   useEffect(() => {
     message &&
       props.addNewMessage({ message, roomid: props.roomDetails.roomid });
   }, [message]);
+
+  useEffect(() => {
+    deleteMessage && props.deleteMessage(deleteMessage);
+  }, [deleteMessage]);
 
   useEffect(() => {
     if (props.roomDetails?.userlist?.length === 2) {
@@ -28,6 +39,9 @@ function ChatArea(props) {
       });
     }
   }, [props.userList, props.roomDetails]);
+  const handleHidePopup = () => {
+    setMenuDetails({});
+  };
 
   const handleSendMessage = () => {
     if ((fieldMsg && fieldMsg.length) || selectedFile) {
@@ -81,8 +95,23 @@ function ChatArea(props) {
             <i className="fa menu-icon fa-ellipsis-v" aria-hidden="true"></i>
           </div>
         </div>
-        <div className="chat-body">
+        <div
+          className="chat-body"
+          onClick={() => {
+            handleHidePopup();
+          }}
+          onScroll={() => {
+            handleHidePopup();
+          }}
+        >
           <div className="initial-msg">stay secure with encryped messaging</div>
+          {menuDetails.showMenu && (
+            <Menu
+              top={menuDetails.top}
+              left={menuDetails.left}
+              sendDeleteRequest={menuDetails.sendDeleteRequest}
+            />
+          )}
           {props.roomDetails?.messages?.map((msg, i) => {
             if (msg?.message?.length || msg?.images?.length) {
               return (
@@ -106,10 +135,17 @@ function ChatArea(props) {
                     }
                     onContextMenu={(e) => {
                       e.preventDefault();
-                      // console.log("Right click", {
-                      //   x: e.nativeEvent.offsetX,
-                      //   y: e.nativeEvent.offsetY,
-                      // });
+                      setMenuDetails({
+                        top: e.clientY,
+                        left: e.clientX,
+                        showMenu: true,
+                        sendDeleteRequest: () => {
+                          sendDeleteRequest({
+                            msgid: msg.msgid,
+                            roomid: props.roomDetails.roomid,
+                          });
+                        },
+                      });
                     }}
                   >
                     <div className="filesContainer">
@@ -132,7 +168,6 @@ function ChatArea(props) {
                     <div className="msg-time">
                       {moment(msg.time).format("hh:mm")}
                     </div>
-                    {/* <Menu /> */}
                   </div>
                 </>
               );
@@ -190,6 +225,9 @@ const mapDispatchToProps = (dispatch) => {
     addNewMessage: (data) => {
       dispatch(addNewMessage(data));
     },
+    deleteMessage: (data) => {
+      dispatch(deleteMessage(data));
+    },
   };
 };
 
@@ -205,8 +243,30 @@ export default connect(mapStateToProps, mapDispatchToProps)(ChatArea);
 
 function Menu(props) {
   return (
-    <div>
-      <div>delete</div>
+    <div
+      style={{
+        justifyContent: "center",
+        display: "flex",
+        alignItems: "center",
+        position: "absolute",
+        backgroundColor: "#272727",
+        borderRadius: 5,
+        boxShadow: "0 2px 8px 5px #111111",
+        padding: 5,
+        minWidth: 150,
+        top: props.top,
+        left: props.left,
+        zIndex: 1,
+      }}
+    >
+      <div
+        style={{ width: "100%", textAlign: "center" }}
+        onClick={() => {
+          props.sendDeleteRequest();
+        }}
+      >
+        delete
+      </div>
     </div>
   );
 }

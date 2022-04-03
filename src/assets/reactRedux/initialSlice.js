@@ -39,7 +39,7 @@ export const initialSlice = createSlice({
         });
         if (
           !state.roomList[index]?.messages?.filter(
-            (e) => e.msdid === action.payload.message.msgid
+            (e) => e.msgid === action.payload.message.msgid
           ).length
         ) {
           state.roomList[index] = {
@@ -49,6 +49,28 @@ export const initialSlice = createSlice({
               : [action.payload.message],
           };
         }
+      }
+    },
+    deleteMessage: (state, action) => {
+      let roomDetails = {},
+        index;
+      state.roomList.forEach((room, pos) => {
+        if (room.roomid === action.payload.roomid) {
+          roomDetails = room;
+          index = pos;
+        }
+      });
+      if (
+        state.roomList[index]?.messages?.filter(
+          (e) => e.msgid === action.payload.msgid
+        ).length
+      ) {
+        state.roomList[index] = {
+          ...roomDetails,
+          messages: roomDetails?.messages.filter(
+            (e) => e.msgid !== action.payload.msgid
+          ),
+        };
       }
     },
   },
@@ -62,6 +84,7 @@ export const {
   setSelectedRoom,
   addRoom,
   addNewMessage,
+  deleteMessage,
 } = initialSlice.actions;
 
 export default initialSlice.reducer;

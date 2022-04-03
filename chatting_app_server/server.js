@@ -12,6 +12,7 @@ const {
   GetAllUserListquery,
   GetUserRoomIDsQuery,
   updateAboutQuery,
+  deleteMessage,
 } = require("./pgconfig");
 const { uploadFiles } = require("./saveFiles");
 const server = require("http").createServer(app);
@@ -23,6 +24,8 @@ const io = require("socket.io")(server, {
 
 const PORT = 4000;
 const NEW_CHAT_MESSAGE_EVENT = "newChatMessage";
+const DELETE_MESSAGE_REQUEST = "deleteMessage";
+
 let storage = multer.diskStorage({
   destination: "public/images",
   filename: function (req, file, cb) {
@@ -30,27 +33,12 @@ let storage = multer.diskStorage({
   },
 });
 let upload = multer({ storage: storage });
-// app.use(function (req, res, next) {
-//   // Website you wish to allow to connect
-//   res.setHeader("Access-Control-Allow-Origin", "https://chatapp.hopto.org");
-
-//   // Request methods you wish to allow
-//   res.setHeader(
-//     "Access-Control-Allow-Methods",
-//     "GET, POST, OPTIONS, PUT, PATCH, DELETE"
-//   );
-
-//   // Pass to next layer of middleware
-//   next();
-// });
 
 app.options(
   "*",
-  cors({ origin: "https://chatapp.hopto.org", optionsSuccessStatus: 200 })
+  cors({ origin: "http://localhost:3000", optionsSuccessStatus: 200 })
 );
-app.use(
-  cors({ origin: "https://chatapp.hopto.org", optionsSuccessStatus: 200 })
-);
+app.use(cors({ origin: "http://localhost:3000", optionsSuccessStatus: 200 }));
 app.use(
   bodyParser.json({ limit: 1024 * 1024 * 100, type: "application/json" })
 ); // to support JSON-encoded bodies
@@ -72,7 +60,6 @@ app.post("/updateAbout", upload.array("files"), function (req, res) {
   res.send("updated");
 });
 app.post("/addNewUser", async function (req, res) {
-  console.log("call recieved fo rnew user", req.body);
   res.send(await SignupQuery(req.body));
 });
 app.post("/loginUser", async function (req, res) {
@@ -101,6 +88,11 @@ io.on("connection", (socket) => {
     );
   });
 
+  socket.on(DELETE_MESSAGE_REQUEST, (data) => {
+    deleteMessage(data.body).then((res) =>
+      io.in(roomId).emit(DELETE_MESSAGE_REQUEST, res)
+    );
+  });
   // socket.on("updatedProfileInfo", (data) => {
   //   console.log(data.body);
   //   io.emit("updatedProfileInfo", data.body);
@@ -113,6 +105,6 @@ io.on("connection", (socket) => {
   });
 });
 
-server.listen(PORT, "127.0.0.1", () => {
+server.listen(PORT, () => {
   console.log(`Listening on port ${PORT}`);
 });

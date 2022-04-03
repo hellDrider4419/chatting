@@ -3,9 +3,12 @@ import socketIOClient from "socket.io-client";
 import { serverUrl } from "../../config";
 
 const NEW_CHAT_MESSAGE_EVENT = "newChatMessage"; // Name of the event
+const DELETE_MESSAGE_REQUEST = "deleteMessage";
 
 const useChat = (roomId) => {
   const [message, setMessage] = useState([]); // Sent and received message
+  const [deleteMessage, setDeleteMessage] = useState([]); // Sent and received message
+
   const socketRef = useRef();
 
   useEffect(() => {
@@ -20,6 +23,12 @@ const useChat = (roomId) => {
         ...message,
       };
       setMessage(incomingMessage);
+    });
+    socketRef.current.on(DELETE_MESSAGE_REQUEST, (message) => {
+      const incomingMessage = {
+        ...message,
+      };
+      setDeleteMessage(incomingMessage);
     });
 
     // Destroys the socket reference
@@ -36,8 +45,13 @@ const useChat = (roomId) => {
       body: messageBody,
     });
   };
+  const sendDeleteRequest = (messageDetails) => {
+    socketRef.current.emit(DELETE_MESSAGE_REQUEST, {
+      body: messageDetails,
+    });
+  };
 
-  return { message, sendMessage };
+  return { message, deleteMessage, sendDeleteRequest, sendMessage };
 };
 
 export default useChat;

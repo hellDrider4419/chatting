@@ -4,8 +4,8 @@ const client = new Client({
   host: `127.0.0.1`,
   user: `postgres`,
   port: 5432,
-  password: `root`,
-  database: `chattingapp`,
+  password: `1`,
+  database: `chatingApp`,
 });
 
 client.connect((err) => {
@@ -151,6 +151,16 @@ const AddNewMessage = async (args) => {
     console.log(`addNewMessage`, err);
   }
 };
+const deleteMessage = async (args) => {
+  try {
+    const result = await client.query(
+      `DELETE FROM messages WHERE msgid = ${args.msgid}`
+    );
+    return result.rowCount ? args : "no msg found";
+  } catch (err) {
+    console.log(`deleteMessage`, err);
+  }
+};
 
 module.exports = {
   AddNewMessage,
@@ -161,5 +171,6 @@ module.exports = {
   GetAllUserListquery,
   GetUserRoomIDsQuery,
   CreateNewRoomQuery,
+  deleteMessage,
   getUserDetailsQuery,
 };
