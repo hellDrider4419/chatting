@@ -44,13 +44,8 @@ let upload = multer({ storage: storage });
 //   next();
 // });
 
-app.options(
-  "*",
-  cors({ origin: "https://chatapp.hopto.org", optionsSuccessStatus: 200 })
-);
-app.use(
-  cors({ origin: "https://chatapp.hopto.org", optionsSuccessStatus: 200 })
-);
+app.options("*", cors({ origin: "15.206.79.199", optionsSuccessStatus: 200 }));
+app.use(cors({ origin: "15.206.79.199", optionsSuccessStatus: 200 }));
 app.use(
   bodyParser.json({ limit: 1024 * 1024 * 100, type: "application/json" })
 ); // to support JSON-encoded bodies
@@ -113,6 +108,6 @@ io.on("connection", (socket) => {
   });
 });
 
-server.listen(PORT, "127.0.0.1", () => {
+server.listen(PORT, "0.0.0.0", () => {
   console.log(`Listening on port ${PORT}`);
 });
