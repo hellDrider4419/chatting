@@ -83,6 +83,10 @@ app.post("/getUserRoomList", async function (req, res) {
   res.send(await GetUserRoomIDsQuery(req.body));
 });
 
+app.get("/check", async function (req, res) {
+  res.send("ha chal gya bhai");
+});
+
 io.on("connection", (socket) => {
   // Join a conversation
   const { roomId } = socket.handshake.query;
