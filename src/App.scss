@@ -479,11 +479,12 @@ body {
   width: 150px;
   object-fit: cover;
   height: 150px;
-  margin: 2px 1px;
+  margin: 2px 2px;
+  background-color: #212121;
 }
 .filesContainer {
   display: flex;
-  max-width: 304px;
+  max-width: 308px;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
