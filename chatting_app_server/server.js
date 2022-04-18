@@ -89,6 +89,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on(DELETE_MESSAGE_REQUEST, (data) => {
+    console.log(data.body);
     deleteMessage(data.body).then((res) =>
       io.in(roomId).emit(DELETE_MESSAGE_REQUEST, res)
     );

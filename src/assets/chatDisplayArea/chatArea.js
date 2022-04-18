@@ -18,14 +18,19 @@ function ChatArea(props) {
   const [selectedFile, setSelectedFile] = useState();
   const [roomUSerInfo, setRoomUserInfo] = useState();
   const [menuDetails, setMenuDetails] = useState({});
+  const [replyMessage, setReplyMessage] = useState();
   useEffect(() => {
     message &&
       props.addNewMessage({ message, roomid: props.roomDetails.roomid });
-  }, [message]);
+  }, [message, props]);
 
   useEffect(() => {
     deleteMessage && props.deleteMessage(deleteMessage);
-  }, [deleteMessage]);
+  }, [deleteMessage, props]);
+
+  useEffect(() => {
+    replyMessage && console.log(replyMessage);
+  }, [replyMessage]);
 
   useEffect(() => {
     if (props.roomDetails?.userlist?.length === 2) {
@@ -55,9 +60,11 @@ function ChatArea(props) {
         userid: props.userInfo.userid,
         roomid: props.roomDetails.roomid,
         file: files,
+        parent_msgid: replyMessage?.msgid ? replyMessage.msgid : null,
       });
       setSelectedFile("");
       setfieldMsg("");
+      setReplyMessage();
     }
   };
 
@@ -97,6 +104,9 @@ function ChatArea(props) {
         </div>
         <div
           className="chat-body"
+          style={{
+            height: replyMessage ? "70%" : "80%",
+          }}
           onClick={() => {
             handleHidePopup();
           }}
@@ -105,18 +115,12 @@ function ChatArea(props) {
           }}
         >
           <div className="initial-msg">stay secure with encryped messaging</div>
-          {menuDetails.showMenu && (
-            <Menu
-              top={menuDetails.top}
-              left={menuDetails.left}
-              sendDeleteRequest={menuDetails.sendDeleteRequest}
-            />
-          )}
+          {menuDetails.showMenu && <Menu {...menuDetails} />}
           {props.roomDetails?.messages?.map((msg, i) => {
             if (msg?.message?.length || msg?.images?.length) {
               return (
                 <>
-                  {(i == 0 ||
+                  {(i === 0 ||
                     moment(props?.roomDetails?.messages[i - 1].time).format(
                       "dddd DD MMMM YYYY"
                     )) !==
@@ -136,18 +140,64 @@ function ChatArea(props) {
                     onContextMenu={(e) => {
                       e.preventDefault();
                       setMenuDetails({
-                        top: e.clientY,
-                        left: e.clientX,
+                        top:
+                          e.clientY + 69 > window.innerHeight
+                            ? e.clientY - 69
+                            : e.clientY,
+                        left:
+                          e.clientX + 160 > window.innerWidth
+                            ? e.clientX - 160
+                            : e.clientX,
                         showMenu: true,
-                        sendDeleteRequest: () => {
-                          sendDeleteRequest({
-                            msgid: msg.msgid,
-                            roomid: props.roomDetails.roomid,
-                          });
+                        deleteBtn: props.userInfo.userid === msg.userid,
+                        sendDeleteRequest:
+                          props.userInfo.userid === msg.userid
+                            ? () => {
+                                sendDeleteRequest({
+                                  msgid: msg.msgid,
+                                  roomid: props.roomDetails.roomid,
+                                });
+                              }
+                            : null,
+                        copyOnCLick: () => {
+                          navigator.clipboard.writeText(msg.message);
+                        },
+                        ReplyOnClick: () => {
+                          setReplyMessage(msg);
                         },
                       });
                     }}
                   >
+                    {msg.parent_msgid &&
+                      props.roomDetails?.messages?.map((replyMsg, i) =>
+                        replyMsg.msgid === msg.parent_msgid ? (
+                          <div className="tagmsg-inner-container">
+                            {replyMsg?.images?.slice(0, 2)?.map((e) => (
+                              <img
+                                className={"tagmsg-files"}
+                                src={`${serverUrl}/images/${e}`}
+                                onError={({ currentTarget }) => {
+                                  currentTarget.onerror = null; // prevents looping
+                                  currentTarget.src = documentThumbnail;
+                                }}
+                                alt="media"
+                              />
+                            ))}
+                            <div
+                              style={{
+                                marginLeft: 10,
+                                marginRight: 10,
+                                width: "-webkit-fill-available",
+                              }}
+                            >
+                              {replyMsg?.message}
+                            </div>
+                            <div className="msg-time">
+                              {moment(replyMsg.time).format("hh:mm")}
+                            </div>
+                          </div>
+                        ) : null
+                      )}
                     <div className="filesContainer">
                       {msg?.images?.slice(0, 4)?.map((e) => (
                         <img
@@ -161,6 +211,7 @@ function ChatArea(props) {
                             currentTarget.onerror = null; // prevents looping
                             currentTarget.src = documentThumbnail;
                           }}
+                          alt="media"
                         />
                       ))}
                     </div>
@@ -174,6 +225,29 @@ function ChatArea(props) {
             }
           })}
         </div>
+        {replyMessage && (
+          <div className="reply-msg">
+            <div className="reply-inner-container">
+              {replyMessage?.images?.slice(0, 2)?.map((e) => (
+                <img
+                  className={"reply-files"}
+                  src={`${serverUrl}/images/${e}`}
+                  onError={({ currentTarget }) => {
+                    currentTarget.onerror = null; // prevents looping
+                    currentTarget.src = documentThumbnail;
+                  }}
+                  alt="media"
+                />
+              ))}
+              <div style={{ marginLeft: 10, marginRight: "auto" }}>
+                {replyMessage.message}
+              </div>
+              <div className="msg-time">
+                {moment(replyMessage.time).format("hh:mm")}
+              </div>
+            </div>
+          </div>
+        )}
         <div className="type-area">
           <label htmlFor="fileInput">
             <i
@@ -202,7 +276,9 @@ function ChatArea(props) {
               onKeyDown={(e) => {
                 e.keyCode === 13 && handleSendMessage();
               }}
-              onChange={(e) => setfieldMsg(e.target.value)}
+              onChange={(e) => {
+                setfieldMsg(e.target.value);
+              }}
             ></input>
             <i
               className="fa fa-arrow-circle-right send-icon"
@@ -244,6 +320,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(ChatArea);
 function Menu(props) {
   return (
     <div
+      id="menu"
       style={{
         justifyContent: "center",
         display: "flex",
@@ -252,20 +329,49 @@ function Menu(props) {
         backgroundColor: "#272727",
         borderRadius: 5,
         boxShadow: "0 2px 8px 5px #111111",
-        padding: 5,
+        padding: "3px 5px",
         minWidth: 150,
         top: props.top,
         left: props.left,
         zIndex: 1,
+        flexDirection: "column",
       }}
     >
+      {props.deleteBtn && (
+        <div
+          style={{
+            width: "100%",
+            textAlign: "center",
+            padding: "5px 0px",
+            // borderBottom: "1px solid grey",
+          }}
+          onClick={() => {
+            props.sendDeleteRequest();
+          }}
+        >
+          delete
+        </div>
+      )}
       <div
-        style={{ width: "100%", textAlign: "center" }}
+        style={{
+          width: "100%",
+          textAlign: "center",
+          padding: "5px 0px",
+          // borderBottom: "1px solid grey",
+        }}
         onClick={() => {
-          props.sendDeleteRequest();
+          props.copyOnCLick();
         }}
       >
-        delete
+        copy text
+      </div>
+      <div
+        style={{ width: "100%", textAlign: "center", padding: "5px 0px" }}
+        onClick={() => {
+          props.ReplyOnClick();
+        }}
+      >
+        reply
       </div>
     </div>
   );

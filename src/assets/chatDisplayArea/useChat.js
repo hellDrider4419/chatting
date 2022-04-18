@@ -4,6 +4,7 @@ import { serverUrl } from "../../config";
 
 const NEW_CHAT_MESSAGE_EVENT = "newChatMessage"; // Name of the event
 const DELETE_MESSAGE_REQUEST = "deleteMessage";
+const CryptoJS = require("crypto-js");
 
 const useChat = (roomId) => {
   const [message, setMessage] = useState([]); // Sent and received message
@@ -19,8 +20,12 @@ const useChat = (roomId) => {
 
     // Listens for incoming message
     socketRef.current.on(NEW_CHAT_MESSAGE_EVENT, (message) => {
+      console.log(message);
+      var bytes = CryptoJS.AES.decrypt(message.message, "mynameisire");
+      var decryptedData = bytes.toString(CryptoJS.enc.Utf8);
       const incomingMessage = {
         ...message,
+        message: decryptedData,
       };
       setMessage(incomingMessage);
     });
@@ -41,6 +46,15 @@ const useChat = (roomId) => {
   // Sends a message to the server that
   // forwards it to all users in the same room
   const sendMessage = (messageBody) => {
+    console.log("msgbody", messageBody);
+    var ciphertext = CryptoJS.AES.encrypt(
+      messageBody.msg,
+      "mynameisire"
+    ).toString();
+
+    messageBody = { ...messageBody, msg: ciphertext };
+
+    // console.log(ciphertext, decryptedData);
     socketRef.current.emit(NEW_CHAT_MESSAGE_EVENT, {
       body: messageBody,
     });

@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+const CryptoJS = require("crypto-js");
 
 export const initialSlice = createSlice({
   name: "initialSlice",
@@ -18,8 +19,18 @@ export const initialSlice = createSlice({
       );
     },
     setRoomList: (state, action) => {
-      console.log(action.payload);
-      state.roomList = action.payload;
+      let roomdata = action.payload?.map((room) => ({
+        ...room,
+        messages: room?.messages?.map((msg) => {
+          var bytes = CryptoJS.AES.decrypt(msg?.message, "mynameisire");
+          var decryptedData = bytes.toString(CryptoJS.enc.Utf8);
+          return {
+            ...msg,
+            message: decryptedData,
+          };
+        }),
+      }));
+      state.roomList = roomdata;
     },
     addRoom: (state, action) => {
       state.roomList = [...state.roomList, action.payload];
