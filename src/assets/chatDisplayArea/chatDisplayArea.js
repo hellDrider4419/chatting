@@ -12,6 +12,7 @@ import history from "../../history";
 import { connect } from "react-redux";
 import {
   setRoomList,
+  setSnackbar,
   setUserInfo,
   setUserList,
 } from "../reactRedux/initialSlice";
@@ -95,7 +96,10 @@ class ChatDisplayArea extends React.Component {
                   this.state.selectedTab === item.name ? "selected-tab" : ""
                 }`}
                 key={item.name}
-                onClick={() => this.handleTabSelection(item.name)}
+                onClick={() => {
+                  this.handleTabSelection(item.name);
+                  this.props.setSnackbar("recent tab selected");
+                }}
               >
                 {item.name}
               </div>
@@ -154,6 +158,9 @@ const mapDispatchToProps = (dispatch) => {
     setRoomList: (data) => {
       dispatch(setRoomList(data));
     },
+    setSnackbar: (data) => {
+      dispatch(setSnackbar(data));
+    },
   };
 };
 const mapStateToProps = (state) => {
@@ -161,6 +168,7 @@ const mapStateToProps = (state) => {
     userInfo: state.initialSlice.userInfo,
     roomList: state.initialSlice.roomList,
     selectedRoom: state.initialSlice.selectedRoom,
+    snackbar: state.initialSlice.snackbar,
   };
 };
 

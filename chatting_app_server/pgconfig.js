@@ -1,4 +1,5 @@
 const { Client } = require(`pg`);
+const fs = require("fs");
 
 const client = new Client({
   host: `127.0.0.1`,
@@ -154,7 +155,12 @@ const AddNewMessage = async (args) => {
 const deleteMessage = async (args) => {
   try {
     const result = await client.query(
-      `DELETE FROM messages WHERE msgid = ${args.msgid}`
+      `DELETE FROM messages WHERE msgid = ${args.msgid} returning *`
+    );
+    result?.rows?.forEach((msg) =>
+      msg?.images?.forEach((img) => {
+        fs.unlink(`./public/images/${img}`, () => {});
+      })
     );
     return result.rowCount ? args : "no msg found";
   } catch (err) {

@@ -8,6 +8,7 @@ import {
 } from "../reactRedux/initialSlice";
 import useChat from "./useChat";
 import documentThumbnail from "../../images/docThumb.png";
+import plusIcon from "../../images/plus.png";
 import { serverUrl } from "../../config";
 
 function ChatArea(props) {
@@ -19,10 +20,27 @@ function ChatArea(props) {
   const [roomUSerInfo, setRoomUserInfo] = useState();
   const [menuDetails, setMenuDetails] = useState({});
   const [replyMessage, setReplyMessage] = useState();
+  const [chatroomHeight, setChatroomHeight] = useState();
   useEffect(() => {
     message &&
       props.addNewMessage({ message, roomid: props.roomDetails.roomid });
   }, [message, props]);
+  useEffect(
+    () =>
+      setChatroomHeight(
+        (document.getElementById("reply-msg")
+          ? document.getElementById("reply-msg").offsetHeight
+          : 0) +
+          (document.getElementById("chat-header")
+            ? document.getElementById("chat-header").offsetHeight
+            : 0) +
+          (document.getElementById("text-area")
+            ? document.getElementById("text-area").offsetHeight
+            : 0) +
+          20
+      ),
+    [props, fieldMsg, selectedFile, roomUSerInfo, menuDetails, replyMessage]
+  );
 
   useEffect(() => {
     deleteMessage && props.deleteMessage(deleteMessage);
@@ -67,7 +85,33 @@ function ChatArea(props) {
       setReplyMessage();
     }
   };
+  useEffect(() => {
+    if (props.selectedRoom === props.roomDetails.roomid) {
+      document.getElementById(
+        `chat-body-${props.roomDetails.roomid}`
+      ).scrollTop = document.getElementById(
+        `chat-body-${props.roomDetails.roomid}`
+      ).scrollHeight;
+    }
+  }, [props.selectedRoom]);
 
+  const displaySelectedImages = () => {
+    let images = [];
+    for (let i = 0; i < selectedFile.length; i++) {
+      images.push(
+        <img
+          className={"reply-files"}
+          src={window.URL.createObjectURL(selectedFile[i])}
+          onError={({ currentTarget }) => {
+            currentTarget.onerror = null; // prevents looping
+            currentTarget.src = documentThumbnail;
+          }}
+          alt="media"
+        />
+      );
+    }
+    return images;
+  };
   return (
     <>
       <div
@@ -80,7 +124,7 @@ function ChatArea(props) {
               : "none",
         }}
       >
-        <div className="chat-header displayFlexCenter">
+        <div className="chat-header displayFlexCenter" id="chat-header">
           <div
             className="person-profile"
             style={{
@@ -104,8 +148,9 @@ function ChatArea(props) {
         </div>
         <div
           className="chat-body"
+          id={`chat-body-${props.roomDetails.roomid}`}
           style={{
-            height: replyMessage ? "70%" : "80%",
+            height: `calc(100% - ${chatroomHeight}px)`,
           }}
           onClick={() => {
             handleHidePopup();
@@ -225,29 +270,37 @@ function ChatArea(props) {
             }
           })}
         </div>
-        {replyMessage && (
-          <div className="reply-msg">
-            <div className="reply-inner-container">
-              {replyMessage?.images?.slice(0, 2)?.map((e) => (
-                <img
-                  className={"reply-files"}
-                  src={`${serverUrl}/images/${e}`}
-                  onError={({ currentTarget }) => {
-                    currentTarget.onerror = null; // prevents looping
-                    currentTarget.src = documentThumbnail;
-                  }}
-                  alt="media"
-                />
-              ))}
-              <div style={{ marginLeft: 10, marginRight: "auto" }}>
-                {replyMessage.message}
+        {(replyMessage || selectedFile) && (
+          <div className="reply-msg" id="reply-msg">
+            {selectedFile && (
+              <div className="selectedFile-inner-container">
+                {displaySelectedImages()}
               </div>
-              <div className="msg-time">
-                {moment(replyMessage.time).format("hh:mm")}
+            )}
+            {replyMessage && (
+              <div className="reply-inner-container">
+                {replyMessage?.images?.slice(0, 2)?.map((e) => (
+                  <img
+                    className={"reply-files"}
+                    src={`${serverUrl}/images/${e}`}
+                    onError={({ currentTarget }) => {
+                      currentTarget.onerror = null; // prevents looping
+                      currentTarget.src = documentThumbnail;
+                    }}
+                    alt="media"
+                  />
+                ))}
+                <div style={{ marginLeft: 10, marginRight: "auto" }}>
+                  {replyMessage.message}
+                </div>
+                <div className="msg-time">
+                  {moment(replyMessage.time).format("hh:mm")}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         )}
+
         <div className="type-area">
           <label htmlFor="fileInput">
             <i
@@ -263,11 +316,13 @@ function ChatArea(props) {
             style={{ display: "none" }}
             accept="media_type"
             onChange={(e) => {
-              setSelectedFile(e.target.files);
+              selectedFile.length
+                ? setSelectedFile([...selectedFile, ...e.target.files])
+                : setSelectedFile(e.target.files);
             }}
           ></input>
 
-          <div className="text-area">
+          <div className="text-area" id="text-area">
             <input
               type="text"
               placeholder="type message here"
@@ -286,6 +341,7 @@ function ChatArea(props) {
               onClick={handleSendMessage}
             ></i>
           </div>
+
           <div className="other-option-popup"></div>
         </div>
       </div>

@@ -8,10 +8,23 @@ export const initialSlice = createSlice({
     userList: [],
     roomList: [],
     selectedRoom: -1,
+    snackbar: "",
   },
   reducers: {
     setUserInfo: (state, action) => {
       state.userInfo = action.payload;
+    },
+    setSnackbar: (state, action) => {
+      var element = document.getElementById("snackbar");
+      element.classList.remove("snackAnim");
+      void element.offsetWidth;
+      state.snackbar = action.payload;
+      console.log("log");
+      element.classList.add("snackAnim");
+      // document.getAnimations().forEach((anim) => {
+      //   anim.cancel();
+      //   anim.play();
+      // });
     },
     setUserList: (state, action) => {
       state.userList = action.payload.filter(
@@ -96,6 +109,7 @@ export const {
   addRoom,
   addNewMessage,
   deleteMessage,
+  setSnackbar,
 } = initialSlice.actions;
 
 export default initialSlice.reducer;
