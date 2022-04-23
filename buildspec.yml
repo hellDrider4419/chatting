@@ -3,13 +3,11 @@ phases:
   install:
     runtime-versions:
       nodejs: 16
-    commands:
-        # install npm
-        - npm install
-   
-   build:
+  
+  build:
     commands:
         # run build script
+        - npm install
         - npm run build
         
 # Include only the files required for your application to run.
