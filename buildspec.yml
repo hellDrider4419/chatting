@@ -13,11 +13,11 @@ phases:
 # Include only the files required for your application to run.
 artifacts:
   files:
-    - build/
-    - chatting_app_server/
-    - node_modules/
-    - public/
-    - src/
+    - build/*
+    - chatting_app_server/*
+    - node_modules/*
+    - public/*
+    - src/*
     - package.json
     - appspec.yml
     - scripts/*.sh
