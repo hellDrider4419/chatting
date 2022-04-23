@@ -7,18 +7,18 @@ phases:
   build:
     commands:
         # run build script
-        - npm install
+        - npm i
         - npm run build
         
 # Include only the files required for your application to run.
 artifacts:
   files:
-     - /*
+     - '**/*'
 #    - build/*
 #    - chatting_app_server/*
 #    - node_modules/*
 #    - public/*
 #    - src/*
-#    - package.json
+#   - package.json
 #    - appspec.yml
 #    - scripts/*.sh
