@@ -4,7 +4,7 @@ os: linux
 
 files:
   - source: /
-    destination: /home/ubuntu/chatting2
+    destination: /home/ubuntu/chatting/
     overwrite: true
 
 permissions:
