@@ -1,0 +1,25 @@
+version: 0.2
+phases:
+  install:
+    runtime-versions:
+      nodejs: 16
+    commands:
+        # install npm
+        - npm install
+   
+   build:
+    commands:
+        # run build script
+        - npm run build
+        
+# Include only the files required for your application to run.
+artifacts:
+  files:
+    - build/
+    - chatting_app_server/
+    - node_modules/
+    - public/
+    - src/
+    - package.json
+    - appspec.yml
+    - scripts/*.sh
