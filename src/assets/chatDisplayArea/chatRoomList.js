@@ -129,26 +129,29 @@ class ChatRoomList extends React.Component {
                     <div className="contact-msg dir_Row displayFlexCenter">
                       <i
                         className={`fa fa-${
-                          item?.messages?.length &&
-                          item?.messages[item?.messages?.length - 1].images
-                            .length
-                            ? "image"
-                            : "commenting"
+                          item?.messages?.length
+                            ? item?.messages[item?.messages?.length - 1].images
+                                .length
+                              ? "image"
+                              : "commenting"
+                            : ""
                         } msg-icon`}
                         aria-hidden="true"
                       ></i>
-                      {item?.messages?.length &&
-                      item?.messages[item?.messages?.length - 1].message
+                      {item?.messages?.length
                         ? item?.messages[item?.messages?.length - 1].message
-                        : "media"}
+                          ? item?.messages[item?.messages?.length - 1].message
+                          : "media"
+                        : ""}
                       <div
                         className="contact-time-menu"
                         style={{ marginLeft: "auto" }}
                       >
-                        {item?.messages?.length &&
-                          moment(
-                            item?.messages[item?.messages?.length - 1].time
-                          ).format("HH:mm")}
+                        {item?.messages?.length
+                          ? moment(
+                              item?.messages[item?.messages?.length - 1].time
+                            ).format("HH:mm")
+                          : ""}
                       </div>
                     </div>
                   </div>

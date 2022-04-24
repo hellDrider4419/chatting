@@ -15,6 +15,9 @@ function ChatArea(props) {
   const { message, deleteMessage, sendDeleteRequest, sendMessage } = useChat(
     props.roomDetails.roomid
   );
+  const [msgLength, setMsgLength] = useState(
+    props.roomDetails?.messages?.length
+  );
   const [fieldMsg, setfieldMsg] = useState("");
   const [selectedFile, setSelectedFile] = useState();
   const [roomUSerInfo, setRoomUserInfo] = useState();
@@ -98,14 +101,18 @@ function ChatArea(props) {
     }
   };
   useEffect(() => {
-    if (props.selectedRoom === props.roomDetails.roomid) {
+    if (
+      props.selectedRoom === props.roomDetails.roomid &&
+      msgLength &&
+      props.roomDetails?.messages?.length > msgLength
+    ) {
       document.getElementById(
         `chat-body-${props.roomDetails.roomid}`
       ).scrollTop = document.getElementById(
         `chat-body-${props.roomDetails.roomid}`
       ).scrollHeight;
     }
-  }, [props.selectedRoom]);
+  }, [props.selectedRoom, props.roomDetails]);
 
   const displaySelectedImages = () => {
     let images = [];
