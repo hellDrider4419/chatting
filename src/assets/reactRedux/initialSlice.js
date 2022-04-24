@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+const CryptoJS = require("crypto-js");
 
 export const initialSlice = createSlice({
   name: "initialSlice",
@@ -7,10 +8,18 @@ export const initialSlice = createSlice({
     userList: [],
     roomList: [],
     selectedRoom: -1,
+    snackbar: "",
   },
   reducers: {
     setUserInfo: (state, action) => {
       state.userInfo = action.payload;
+    },
+    setSnackbar: (state, action) => {
+      var element = document.getElementById("snackbar");
+      element.classList.remove("snackAnim");
+      void element.offsetWidth;
+      state.snackbar = action.payload;
+      element.classList.add("snackAnim");
     },
     setUserList: (state, action) => {
       state.userList = action.payload.filter(
@@ -18,11 +27,36 @@ export const initialSlice = createSlice({
       );
     },
     setRoomList: (state, action) => {
-      console.log(action.payload);
-      state.roomList = action.payload;
+      let roomdata = action.payload?.map((room) => ({
+        ...room,
+        messages: room?.messages?.map((msg) => {
+          var bytes = CryptoJS.AES.decrypt(msg?.message, "mynameisire");
+          var decryptedData = bytes.toString(CryptoJS.enc.Utf8);
+          return {
+            ...msg,
+            message: decryptedData,
+          };
+        }),
+      }));
+      state.roomList = roomdata;
     },
     addRoom: (state, action) => {
-      state.roomList = [...state.roomList, action.payload];
+      let roomDetails = {},
+        index;
+      state.roomList.forEach((room, pos) => {
+        if (room.roomid === action.payload.roomid) {
+          roomDetails = room;
+          index = pos;
+        }
+      });
+      if (index || index === 0) {
+        state.roomList[index] = {
+          ...state.roomList[index],
+          ...action.payload,
+        };
+      } else {
+        state.roomList = [...state.roomList, action.payload];
+      }
     },
     setSelectedRoom: (state, action) => {
       state.selectedRoom = action.payload;
@@ -39,7 +73,7 @@ export const initialSlice = createSlice({
         });
         if (
           !state.roomList[index]?.messages?.filter(
-            (e) => e.msdid === action.payload.message.msgid
+            (e) => e.msgid === action.payload.message.msgid
           ).length
         ) {
           state.roomList[index] = {
@@ -48,7 +82,56 @@ export const initialSlice = createSlice({
               ? [...roomDetails?.messages, action.payload.message]
               : [action.payload.message],
           };
+          if (action.payload.userid !== action.payload.message.userid) {
+            var element = document.getElementById("snackbar");
+            element.classList.remove("snackAnim");
+            void element.offsetWidth;
+            state.snackbar = "new message recieved";
+            element.classList.add("snackAnim");
+          }
         }
+      }
+    },
+    deleteMessage: (state, action) => {
+      let roomDetails = {},
+        index;
+      state.roomList.forEach((room, pos) => {
+        if (room.roomid === action.payload.roomid) {
+          roomDetails = room;
+          index = pos;
+        }
+      });
+      if (
+        state.roomList[index]?.messages?.filter(
+          (e) => e.msgid === action.payload.msgid
+        ).length
+      ) {
+        state.roomList[index] = {
+          ...roomDetails,
+          messages: roomDetails?.messages.filter(
+            (e) => e.msgid !== action.payload.msgid
+          ),
+        };
+      }
+    },
+    setDeleteRoom: (state, action) => {
+      let roomDetails = {},
+        index;
+      state.roomList.forEach((room, pos) => {
+        if (room.roomid === action.payload.roomid) {
+          roomDetails = room;
+          index = pos;
+        }
+      });
+      state.roomList[index] = {
+        ...roomDetails,
+        showroom: roomDetails.showroom.filter(
+          (e) => e != action.payload.userid
+        ),
+        messages: [],
+      };
+      if (state.selectedRoom === action.payload.roomid) {
+        state.selectedRoom = -1;
       }
     },
   },
@@ -62,6 +145,9 @@ export const {
   setSelectedRoom,
   addRoom,
   addNewMessage,
+  deleteMessage,
+  setSnackbar,
+  setDeleteRoom,
 } = initialSlice.actions;
 
 export default initialSlice.reducer;

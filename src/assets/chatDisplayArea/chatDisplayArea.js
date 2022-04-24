@@ -95,18 +95,19 @@ class ChatDisplayArea extends React.Component {
                   this.state.selectedTab === item.name ? "selected-tab" : ""
                 }`}
                 key={item.name}
-                onClick={() => this.handleTabSelection(item.name)}
+                onClick={() => {
+                  this.handleTabSelection(item.name);
+                }}
               >
                 {item.name}
               </div>
             ))}
           </div>
           {this.state.selectedTab === this.tabList[0].name && <ChatRoomList />}
-          {this.state.selectedTab === this.tabList[1].name && <ContactList />}
+          {this.state.selectedTab === this.tabList[1].name && (
+            <ContactList handleTabSelection={this.handleTabSelection} />
+          )}
           {this.state.selectedTab === this.tabList[2].name && <ContactList />}
-          <div className="recent-contact-footer">
-            stay connected, stay happy ...
-          </div>
         </div>
         {
           <div

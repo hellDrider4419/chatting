@@ -1,20 +1,69 @@
 import moment from "moment";
 import { useEffect, useState } from "react";
 import { connect } from "react-redux";
-import { addNewMessage, setSelectedRoom } from "../reactRedux/initialSlice";
+import {
+  addNewMessage,
+  deleteMessage,
+  setSelectedRoom,
+  setSnackbar,
+} from "../reactRedux/initialSlice";
 import useChat from "./useChat";
 import documentThumbnail from "../../images/docThumb.png";
 import { serverUrl } from "../../config";
 
 function ChatArea(props) {
-  const { message, sendMessage } = useChat(props.roomDetails.roomid);
+  const { message, deleteMessage, sendDeleteRequest, sendMessage } = useChat(
+    props.roomDetails.roomid
+  );
+  const [msgLength, setMsgLength] = useState(
+    props.roomDetails?.messages?.length
+  );
   const [fieldMsg, setfieldMsg] = useState("");
   const [selectedFile, setSelectedFile] = useState();
   const [roomUSerInfo, setRoomUserInfo] = useState();
+  const [menuDetails, setMenuDetails] = useState({});
+  const [replyMessage, setReplyMessage] = useState();
+  const [chatroomHeight, setChatroomHeight] = useState();
   useEffect(() => {
     message &&
-      props.addNewMessage({ message, roomid: props.roomDetails.roomid });
+      props.addNewMessage({
+        message,
+        roomid: props.roomDetails.roomid,
+        userid: props.userInfo.userid,
+      });
+    document.getElementById(`chat-body-${props.roomDetails.roomid}`).scrollTop =
+      document.getElementById(
+        `chat-body-${props.roomDetails.roomid}`
+      ).scrollHeight;
   }, [message]);
+  useEffect(
+    () =>
+      setChatroomHeight(
+        (document.getElementById("reply-msg")
+          ? document.getElementById("reply-msg").offsetHeight
+          : 0) +
+          (document.getElementById("chat-header")
+            ? document.getElementById("chat-header").offsetHeight
+            : 0) +
+          (document.getElementById("text-area")
+            ? document.getElementById("text-area").offsetHeight
+            : 0) +
+          20
+      ),
+    [
+      props,
+      fieldMsg,
+      selectedFile,
+      roomUSerInfo,
+      menuDetails,
+      replyMessage,
+      deleteMessage,
+    ]
+  );
+
+  useEffect(() => {
+    deleteMessage && props.deleteMessage(deleteMessage);
+  }, [deleteMessage]);
 
   useEffect(() => {
     if (props.roomDetails?.userlist?.length === 2) {
@@ -28,6 +77,9 @@ function ChatArea(props) {
       });
     }
   }, [props.userList, props.roomDetails]);
+  const handleHidePopup = () => {
+    setMenuDetails({});
+  };
 
   const handleSendMessage = () => {
     if ((fieldMsg && fieldMsg.length) || selectedFile) {
@@ -41,12 +93,44 @@ function ChatArea(props) {
         userid: props.userInfo.userid,
         roomid: props.roomDetails.roomid,
         file: files,
+        parent_msgid: replyMessage?.msgid ? replyMessage.msgid : null,
       });
-      setSelectedFile("");
+      setSelectedFile();
       setfieldMsg("");
+      setReplyMessage();
     }
   };
+  useEffect(() => {
+    if (
+      props.selectedRoom === props.roomDetails.roomid &&
+      msgLength &&
+      props.roomDetails?.messages?.length > msgLength
+    ) {
+      document.getElementById(
+        `chat-body-${props.roomDetails.roomid}`
+      ).scrollTop = document.getElementById(
+        `chat-body-${props.roomDetails.roomid}`
+      ).scrollHeight;
+    }
+  }, [props.selectedRoom, props.roomDetails]);
 
+  const displaySelectedImages = () => {
+    let images = [];
+    for (let i = 0; i < selectedFile.length; i++) {
+      images.push(
+        <img
+          className={"reply-files"}
+          src={window.URL.createObjectURL(selectedFile[i])}
+          onError={({ currentTarget }) => {
+            currentTarget.onerror = null; // prevents looping
+            currentTarget.src = documentThumbnail;
+          }}
+          alt="media"
+        />
+      );
+    }
+    return images;
+  };
   return (
     <>
       <div
@@ -59,7 +143,7 @@ function ChatArea(props) {
               : "none",
         }}
       >
-        <div className="chat-header displayFlexCenter">
+        <div className="chat-header displayFlexCenter" id="chat-header">
           <div
             className="person-profile"
             style={{
@@ -81,13 +165,26 @@ function ChatArea(props) {
             <i className="fa menu-icon fa-ellipsis-v" aria-hidden="true"></i>
           </div>
         </div>
-        <div className="chat-body">
-          <div className="initial-msg">stay secure with encryped messaging</div>
+        <div
+          className="chat-body"
+          id={`chat-body-${props.roomDetails.roomid}`}
+          style={{
+            height: `calc(100% - ${chatroomHeight}px)`,
+          }}
+          onClick={() => {
+            handleHidePopup();
+          }}
+          onScroll={() => {
+            handleHidePopup();
+          }}
+        >
+          <div className="initial-msg">encryped messaging</div>
+          {menuDetails.showMenu && <Menu {...menuDetails} />}
           {props.roomDetails?.messages?.map((msg, i) => {
             if (msg?.message?.length || msg?.images?.length) {
               return (
                 <>
-                  {(i == 0 ||
+                  {(i === 0 ||
                     moment(props?.roomDetails?.messages[i - 1].time).format(
                       "dddd DD MMMM YYYY"
                     )) !==
@@ -106,12 +203,66 @@ function ChatArea(props) {
                     }
                     onContextMenu={(e) => {
                       e.preventDefault();
-                      // console.log("Right click", {
-                      //   x: e.nativeEvent.offsetX,
-                      //   y: e.nativeEvent.offsetY,
-                      // });
+                      setMenuDetails({
+                        top:
+                          e.clientY + 69 > window.innerHeight
+                            ? e.clientY - 69
+                            : e.clientY,
+                        left:
+                          e.clientX + 160 > window.innerWidth
+                            ? e.clientX - 160
+                            : e.clientX,
+                        showMenu: true,
+                        deleteBtn: props.userInfo.userid === msg.userid,
+                        sendDeleteRequest:
+                          props.userInfo.userid === msg.userid
+                            ? () => {
+                                sendDeleteRequest({
+                                  msgid: msg.msgid,
+                                  roomid: props.roomDetails.roomid,
+                                });
+                                props.setSnackbar("message deleted");
+                              }
+                            : null,
+                        copyOnCLick: () => {
+                          navigator.clipboard.writeText(msg.message);
+                        },
+                        ReplyOnClick: () => {
+                          setReplyMessage(msg);
+                        },
+                      });
                     }}
                   >
+                    {msg.parent_msgid &&
+                      props.roomDetails?.messages?.map((replyMsg, i) =>
+                        replyMsg.msgid === msg.parent_msgid ? (
+                          <div className="tagmsg-inner-container">
+                            {replyMsg?.images?.slice(0, 2)?.map((e) => (
+                              <img
+                                className={"tagmsg-files"}
+                                src={`${serverUrl}/images/${e}`}
+                                onError={({ currentTarget }) => {
+                                  currentTarget.onerror = null; // prevents looping
+                                  currentTarget.src = documentThumbnail;
+                                }}
+                                alt="media"
+                              />
+                            ))}
+                            <div
+                              style={{
+                                marginLeft: 10,
+                                marginRight: 10,
+                                width: "-webkit-fill-available",
+                              }}
+                            >
+                              {replyMsg?.message}
+                            </div>
+                            <div className="msg-time">
+                              {moment(replyMsg.time).format("hh:mm")}
+                            </div>
+                          </div>
+                        ) : null
+                      )}
                     <div className="filesContainer">
                       {msg?.images?.slice(0, 4)?.map((e) => (
                         <img
@@ -125,6 +276,7 @@ function ChatArea(props) {
                             currentTarget.onerror = null; // prevents looping
                             currentTarget.src = documentThumbnail;
                           }}
+                          alt="media"
                         />
                       ))}
                     </div>
@@ -132,13 +284,43 @@ function ChatArea(props) {
                     <div className="msg-time">
                       {moment(msg.time).format("hh:mm")}
                     </div>
-                    {/* <Menu /> */}
                   </div>
                 </>
               );
             }
           })}
         </div>
+        {(replyMessage || selectedFile) && (
+          <div className="reply-msg" id="reply-msg">
+            {selectedFile && (
+              <div className="selectedFile-inner-container">
+                {displaySelectedImages()}
+              </div>
+            )}
+            {replyMessage && (
+              <div className="reply-inner-container">
+                {replyMessage?.images?.slice(0, 2)?.map((e) => (
+                  <img
+                    className={"reply-files"}
+                    src={`${serverUrl}/images/${e}`}
+                    onError={({ currentTarget }) => {
+                      currentTarget.onerror = null; // prevents looping
+                      currentTarget.src = documentThumbnail;
+                    }}
+                    alt="media"
+                  />
+                ))}
+                <div style={{ marginLeft: 10, marginRight: "auto" }}>
+                  {replyMessage.message}
+                </div>
+                <div className="msg-time">
+                  {moment(replyMessage.time).format("hh:mm")}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
         <div className="type-area">
           <label htmlFor="fileInput">
             <i
@@ -154,11 +336,13 @@ function ChatArea(props) {
             style={{ display: "none" }}
             accept="media_type"
             onChange={(e) => {
-              setSelectedFile(e.target.files);
+              selectedFile
+                ? setSelectedFile([...selectedFile, ...e.target.files])
+                : setSelectedFile([...e.target.files]);
             }}
           ></input>
 
-          <div className="text-area">
+          <div className="text-area" id="text-area">
             <input
               type="text"
               placeholder="type message here"
@@ -167,7 +351,9 @@ function ChatArea(props) {
               onKeyDown={(e) => {
                 e.keyCode === 13 && handleSendMessage();
               }}
-              onChange={(e) => setfieldMsg(e.target.value)}
+              onChange={(e) => {
+                setfieldMsg(e.target.value);
+              }}
             ></input>
             <i
               className="fa fa-arrow-circle-right send-icon"
@@ -175,6 +361,7 @@ function ChatArea(props) {
               onClick={handleSendMessage}
             ></i>
           </div>
+
           <div className="other-option-popup"></div>
         </div>
       </div>
@@ -189,6 +376,12 @@ const mapDispatchToProps = (dispatch) => {
     },
     addNewMessage: (data) => {
       dispatch(addNewMessage(data));
+    },
+    deleteMessage: (data) => {
+      dispatch(deleteMessage(data));
+    },
+    setSnackbar: (data) => {
+      dispatch(setSnackbar(data));
     },
   };
 };
@@ -205,8 +398,60 @@ export default connect(mapStateToProps, mapDispatchToProps)(ChatArea);
 
 function Menu(props) {
   return (
-    <div>
-      <div>delete</div>
+    <div
+      id="menu"
+      style={{
+        justifyContent: "center",
+        display: "flex",
+        alignItems: "center",
+        position: "absolute",
+        backgroundColor: "#272727",
+        borderRadius: 5,
+        boxShadow: "0 2px 8px 5px #111111",
+        padding: "3px 5px",
+        minWidth: 150,
+        top: props.top,
+        left: props.left,
+        zIndex: 1,
+        flexDirection: "column",
+      }}
+    >
+      {props.deleteBtn && (
+        <div
+          style={{
+            width: "100%",
+            textAlign: "center",
+            padding: "5px 0px",
+            // borderBottom: "1px solid grey",
+          }}
+          onClick={() => {
+            props.sendDeleteRequest();
+          }}
+        >
+          delete
+        </div>
+      )}
+      <div
+        style={{
+          width: "100%",
+          textAlign: "center",
+          padding: "5px 0px",
+          // borderBottom: "1px solid grey",
+        }}
+        onClick={() => {
+          props.copyOnCLick();
+        }}
+      >
+        copy text
+      </div>
+      <div
+        style={{ width: "100%", textAlign: "center", padding: "5px 0px" }}
+        onClick={() => {
+          props.ReplyOnClick();
+        }}
+      >
+        reply
+      </div>
     </div>
   );
 }

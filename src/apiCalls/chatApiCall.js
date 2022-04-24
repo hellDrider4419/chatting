@@ -25,3 +25,7 @@ export const updateAbout = async (args) => {
   const result = await axios.post(`${serverUrl}/updateAbout`, args);
   return result.data;
 };
+export const deleteRoom = async (args) => {
+  const result = await axios.post(`${serverUrl}/deleteRoom`, args);
+  return result.data;
+};

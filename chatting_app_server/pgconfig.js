@@ -1,11 +1,12 @@
 const { Client } = require(`pg`);
+const fs = require("fs");
 
 const client = new Client({
   host: `127.0.0.1`,
   user: `postgres`,
   port: 5432,
-  password: `root`,
-  database: `chattingapp`,
+  password: `1`,
+  database: `chatingApp`,
 });
 
 client.connect((err) => {
@@ -29,7 +30,6 @@ const SignupQuery = async (args) => {
     const UserAlreadyExist = await client.query(
       `select userid from  userinfo where email = '${args.email}'`
     );
-    console.log(args, UserAlreadyExist);
     if (UserAlreadyExist.rowCount) {
       return "user already exist, Please login";
     } else {
@@ -113,7 +113,7 @@ const GetAllUserListquery = async () => {
 const GetUserRoomIDsQuery = async (args) => {
   try {
     const result = await client.query(
-      `select *,(select json_agg(data) from (select * from  messages m where m.roomid = r.roomid) data) 
+      `select *,(select json_agg(data) from (select * from  messages m where m.roomid = r.roomid and ${args.userid} = any(m.showmsg) ) data) 
         as messages from rooms r where  ${args.userid} = any(userlist)`
     );
     return result.rows;
@@ -124,16 +124,19 @@ const GetUserRoomIDsQuery = async (args) => {
 
 const CreateNewRoomQuery = async (args) => {
   try {
-    const roomAlreadyExist = await client.query(
+    let roomAlreadyExist = await client.query(
       `select * from rooms where ${args.userList[0]} = any(userlist) and ${args.userList[1]} = any(userlist) `
     );
 
     if (roomAlreadyExist.rows.length === 0) {
       const result = await client.query(
-        `INSERT INTO rooms (userlist,name) VALUES ('{${args.userList}}','${args.roomName}') returning *`
+        `INSERT INTO rooms (userlist,name,showroom) VALUES ('{${args.userList}}','${args.roomName}','{${args.userList}}') returning *`
       );
       return result.rows[0];
     } else {
+      roomAlreadyExist = await client.query(
+        `update rooms set showroom = '{${roomAlreadyExist.rows[0].userlist}}' where roomid = ${roomAlreadyExist.rows[0].roomid} returning *`
+      );
       return roomAlreadyExist.rows[0];
     }
   } catch (err) {
@@ -143,12 +146,51 @@ const CreateNewRoomQuery = async (args) => {
 
 const AddNewMessage = async (args) => {
   try {
+    const roomdata = await client.query(
+      `select * from rooms where roomid = ${args.roomid}`
+    );
+    await client.query(
+      `update rooms set showroom = '{${roomdata.rows[0].userlist}}' where roomid = ${args.roomid} returning *`
+    );
     const result =
-      await client.query(`INSERT INTO messages(roomid, userid, message, time, images)
-	VALUES (${args.roomid}, ${args.userid}, '${args.msg}', '${args.time}', '{${args.file}}') returning *`);
+      await client.query(`INSERT INTO messages(roomid, userid, message, time, images, parent_msgid,showmsg)
+	VALUES (${args.roomid}, ${args.userid}, '${args.msg}', '${args.time}', '{${args.file}}', ${args.parent_msgid},'{${roomdata.rows[0].userlist}}') returning *`);
     return result.rows[0];
   } catch (err) {
     console.log(`addNewMessage`, err);
+  }
+};
+const deleteMessage = async (args) => {
+  try {
+    const result = await client.query(
+      `DELETE FROM messages WHERE msgid = ${args.msgid} returning *`
+    );
+    result?.rows?.forEach(
+      (msg) =>
+        msg?.images?.length &&
+        msg?.images?.forEach((img) => {
+          fs.unlink(`./public/images/${img}`, () => {});
+        })
+    );
+    return result.rowCount ? args : "no msg found";
+  } catch (err) {
+    console.log(`deleteMessage`, err);
+  }
+};
+
+const deleteRoom = async (args) => {
+  try {
+    const roomdata = await client.query(
+      `select * from rooms where roomid = ${args.roomid}`
+    );
+    await client.query(
+      `update rooms set showroom = '{${roomdata.rows[0].userlist?.filter(
+        (e) => e !== args.userid
+      )}}' where roomid = ${args.roomid} returning *`
+    );
+    return args;
+  } catch (err) {
+    console.log(`deleteRoom`, err);
   }
 };
 
@@ -161,5 +203,7 @@ module.exports = {
   GetAllUserListquery,
   GetUserRoomIDsQuery,
   CreateNewRoomQuery,
+  deleteMessage,
   getUserDetailsQuery,
+  deleteRoom,
 };
