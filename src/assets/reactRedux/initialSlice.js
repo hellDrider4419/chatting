@@ -19,12 +19,7 @@ export const initialSlice = createSlice({
       element.classList.remove("snackAnim");
       void element.offsetWidth;
       state.snackbar = action.payload;
-      console.log("log");
       element.classList.add("snackAnim");
-      // document.getAnimations().forEach((anim) => {
-      //   anim.cancel();
-      //   anim.play();
-      // });
     },
     setUserList: (state, action) => {
       state.userList = action.payload.filter(
@@ -46,7 +41,22 @@ export const initialSlice = createSlice({
       state.roomList = roomdata;
     },
     addRoom: (state, action) => {
-      state.roomList = [...state.roomList, action.payload];
+      let roomDetails = {},
+        index;
+      state.roomList.forEach((room, pos) => {
+        if (room.roomid === action.payload.roomid) {
+          roomDetails = room;
+          index = pos;
+        }
+      });
+      if (index || index === 0) {
+        state.roomList[index] = {
+          ...state.roomList[index],
+          ...action.payload,
+        };
+      } else {
+        state.roomList = [...state.roomList, action.payload];
+      }
     },
     setSelectedRoom: (state, action) => {
       state.selectedRoom = action.payload;
@@ -72,6 +82,13 @@ export const initialSlice = createSlice({
               ? [...roomDetails?.messages, action.payload.message]
               : [action.payload.message],
           };
+          if (action.payload.userid !== action.payload.message.userid) {
+            var element = document.getElementById("snackbar");
+            element.classList.remove("snackAnim");
+            void element.offsetWidth;
+            state.snackbar = "new message recieved";
+            element.classList.add("snackAnim");
+          }
         }
       }
     },
@@ -97,6 +114,26 @@ export const initialSlice = createSlice({
         };
       }
     },
+    setDeleteRoom: (state, action) => {
+      let roomDetails = {},
+        index;
+      state.roomList.forEach((room, pos) => {
+        if (room.roomid === action.payload.roomid) {
+          roomDetails = room;
+          index = pos;
+        }
+      });
+      state.roomList[index] = {
+        ...roomDetails,
+        showroom: roomDetails.showroom.filter(
+          (e) => e != action.payload.userid
+        ),
+        messages: [],
+      };
+      if (state.selectedRoom === action.payload.roomid) {
+        state.selectedRoom = -1;
+      }
+    },
   },
 });
 
@@ -110,6 +147,7 @@ export const {
   addNewMessage,
   deleteMessage,
   setSnackbar,
+  setDeleteRoom,
 } = initialSlice.actions;
 
 export default initialSlice.reducer;

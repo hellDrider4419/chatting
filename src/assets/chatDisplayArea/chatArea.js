@@ -5,10 +5,10 @@ import {
   addNewMessage,
   deleteMessage,
   setSelectedRoom,
+  setSnackbar,
 } from "../reactRedux/initialSlice";
 import useChat from "./useChat";
 import documentThumbnail from "../../images/docThumb.png";
-import plusIcon from "../../images/plus.png";
 import { serverUrl } from "../../config";
 
 function ChatArea(props) {
@@ -23,8 +23,16 @@ function ChatArea(props) {
   const [chatroomHeight, setChatroomHeight] = useState();
   useEffect(() => {
     message &&
-      props.addNewMessage({ message, roomid: props.roomDetails.roomid });
-  }, [message, props]);
+      props.addNewMessage({
+        message,
+        roomid: props.roomDetails.roomid,
+        userid: props.userInfo.userid,
+      });
+    document.getElementById(`chat-body-${props.roomDetails.roomid}`).scrollTop =
+      document.getElementById(
+        `chat-body-${props.roomDetails.roomid}`
+      ).scrollHeight;
+  }, [message]);
   useEffect(
     () =>
       setChatroomHeight(
@@ -39,16 +47,20 @@ function ChatArea(props) {
             : 0) +
           20
       ),
-    [props, fieldMsg, selectedFile, roomUSerInfo, menuDetails, replyMessage]
+    [
+      props,
+      fieldMsg,
+      selectedFile,
+      roomUSerInfo,
+      menuDetails,
+      replyMessage,
+      deleteMessage,
+    ]
   );
 
   useEffect(() => {
     deleteMessage && props.deleteMessage(deleteMessage);
-  }, [deleteMessage, props]);
-
-  useEffect(() => {
-    replyMessage && console.log(replyMessage);
-  }, [replyMessage]);
+  }, [deleteMessage]);
 
   useEffect(() => {
     if (props.roomDetails?.userlist?.length === 2) {
@@ -80,7 +92,7 @@ function ChatArea(props) {
         file: files,
         parent_msgid: replyMessage?.msgid ? replyMessage.msgid : null,
       });
-      setSelectedFile("");
+      setSelectedFile();
       setfieldMsg("");
       setReplyMessage();
     }
@@ -159,7 +171,7 @@ function ChatArea(props) {
             handleHidePopup();
           }}
         >
-          <div className="initial-msg">stay secure with encryped messaging</div>
+          <div className="initial-msg">encryped messaging</div>
           {menuDetails.showMenu && <Menu {...menuDetails} />}
           {props.roomDetails?.messages?.map((msg, i) => {
             if (msg?.message?.length || msg?.images?.length) {
@@ -202,6 +214,7 @@ function ChatArea(props) {
                                   msgid: msg.msgid,
                                   roomid: props.roomDetails.roomid,
                                 });
+                                props.setSnackbar("message deleted");
                               }
                             : null,
                         copyOnCLick: () => {
@@ -316,9 +329,9 @@ function ChatArea(props) {
             style={{ display: "none" }}
             accept="media_type"
             onChange={(e) => {
-              selectedFile.length
+              selectedFile
                 ? setSelectedFile([...selectedFile, ...e.target.files])
-                : setSelectedFile(e.target.files);
+                : setSelectedFile([...e.target.files]);
             }}
           ></input>
 
@@ -359,6 +372,9 @@ const mapDispatchToProps = (dispatch) => {
     },
     deleteMessage: (data) => {
       dispatch(deleteMessage(data));
+    },
+    setSnackbar: (data) => {
+      dispatch(setSnackbar(data));
     },
   };
 };

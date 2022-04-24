@@ -13,6 +13,7 @@ const {
   GetUserRoomIDsQuery,
   updateAboutQuery,
   deleteMessage,
+  deleteRoom,
 } = require("./pgconfig");
 const { uploadFiles } = require("./saveFiles");
 const server = require("http").createServer(app);
@@ -74,6 +75,9 @@ app.post("/getUserDetails", async function (req, res) {
 app.post("/getUserRoomList", async function (req, res) {
   res.send(await GetUserRoomIDsQuery(req.body));
 });
+app.post("/deleteRoom", async function (req, res) {
+  res.send(await deleteRoom(req.body));
+});
 
 io.on("connection", (socket) => {
   // Join a conversation
@@ -89,13 +93,11 @@ io.on("connection", (socket) => {
   });
 
   socket.on(DELETE_MESSAGE_REQUEST, (data) => {
-    console.log(data.body);
     deleteMessage(data.body).then((res) =>
       io.in(roomId).emit(DELETE_MESSAGE_REQUEST, res)
     );
   });
   // socket.on("updatedProfileInfo", (data) => {
-  //   console.log(data.body);
   //   io.emit("updatedProfileInfo", data.body);
   //   // AddNewMessage(data.body).then((res) => io.emit("updatedProfileInfo", res));
   // });

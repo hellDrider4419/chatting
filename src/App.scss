@@ -36,6 +36,10 @@ body {
   background-color: #212121;
 }
 
+.initial-msg {
+  color: grey;
+}
+
 .dir_Row {
   flex-direction: row;
 }
@@ -162,6 +166,7 @@ body {
   padding: 5px 40px;
   border-top: 1px solid #1191a2;
   text-align: center;
+  height: -webkit-fill-available;
 }
 .recent-contact {
   width: 100%;
@@ -477,11 +482,11 @@ body {
 
 .multiplefiles {
   border-radius: 5px;
-  width: 150px;
+  width: 146px;
   object-fit: cover;
   height: 150px;
+  border: 1px solid #545252;
   margin: 2px 2px;
-  background-color: #212121;
 }
 .filesContainer {
   display: flex;
@@ -517,7 +522,7 @@ body {
   border-radius: 5px;
   overflow-x: scroll;
   height: 43px;
-  width: 250px;
+  max-width: 250px;
   padding: 5px;
 }
 
