@@ -1,7 +1,9 @@
 import React from "react";
 import { connect } from "react-redux";
 import { createNewRoom, getUserList } from "../../apiCalls/chatApiCall";
+import { serverUrl } from "../../config";
 import { addRoom, setSelectedRoom } from "../reactRedux/initialSlice";
+import profilepic from "./../../images/profilepic.png";
 
 class ContactList extends React.Component {
   constructor(props) {
@@ -19,6 +21,28 @@ class ContactList extends React.Component {
     this.props.setSelectedRoom(result.roomid);
   };
 
+  handleNoImage = (item) => {
+    try {
+      return (
+        <div
+          className="contact-profile hw25"
+          style={{
+            backgroundImage: `url(${serverUrl}/images/${item.pofileimage})`,
+          }}
+        ></div>
+      );
+    } catch (err) {
+      return (
+        <div
+          className="contact-profile hw25"
+          style={{
+            backgroundImage: `url(${window.URL.createObjectURL(profilepic)})`,
+          }}
+        ></div>
+      );
+    }
+  };
+
   render() {
     return (
       <>
@@ -28,7 +52,7 @@ class ContactList extends React.Component {
               className="contact-container displayFlexCenter h40"
               onClick={() => this.handleCreateRoom(item)}
             >
-              <div className="contact-profile hw25"></div>
+              {this.handleNoImage(item)}
               <div className="contact-details">
                 <div className="contact-menu displayFlexCenter">
                   <div className="contact-name">{item.name}</div>

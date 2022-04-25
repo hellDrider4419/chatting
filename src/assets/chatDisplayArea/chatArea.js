@@ -39,16 +39,19 @@ function ChatArea(props) {
   useEffect(
     () =>
       setChatroomHeight(
-        (document.getElementById("reply-msg")
-          ? document.getElementById("reply-msg").offsetHeight
+        (document.getElementById(`reply-msg-${props.roomDetails.roomid}`)
+          ? document.getElementById(`reply-msg-${props.roomDetails.roomid}`)
+              .offsetHeight
           : 0) +
-          (document.getElementById("chat-header")
-            ? document.getElementById("chat-header").offsetHeight
+          (document.getElementById(`chat-header-${props.roomDetails.roomid}`)
+            ? document.getElementById(`chat-header-${props.roomDetails.roomid}`)
+                .offsetHeight
             : 0) +
-          (document.getElementById("text-area")
-            ? document.getElementById("text-area").offsetHeight
+          (document.getElementById(`type-area-${props.roomDetails.roomid}`)
+            ? document.getElementById(`type-area-${props.roomDetails.roomid}`)
+                .offsetHeight
             : 0) +
-          20
+          10
       ),
     [
       props,
@@ -118,15 +121,30 @@ function ChatArea(props) {
     let images = [];
     for (let i = 0; i < selectedFile.length; i++) {
       images.push(
-        <img
-          className={"reply-files"}
-          src={window.URL.createObjectURL(selectedFile[i])}
-          onError={({ currentTarget }) => {
-            currentTarget.onerror = null; // prevents looping
-            currentTarget.src = documentThumbnail;
-          }}
-          alt="media"
-        />
+        <div className="reply-files-container">
+          <img
+            className={"reply-files"}
+            src={window.URL.createObjectURL(selectedFile[i])}
+            onError={({ currentTarget }) => {
+              currentTarget.onerror = null; // prevents looping
+              currentTarget.src = documentThumbnail;
+            }}
+            alt="media"
+          />
+          <div className="cancel-btn">
+            <i
+              className="fa fa-close "
+              onClick={() => {
+                selectedFile?.length > 1
+                  ? setSelectedFile([
+                      ...selectedFile?.filter((e, index) => i != index),
+                    ])
+                  : setSelectedFile();
+              }}
+              aria-hidden="true"
+            ></i>
+          </div>
+        </div>
       );
     }
     return images;
@@ -143,7 +161,10 @@ function ChatArea(props) {
               : "none",
         }}
       >
-        <div className="chat-header displayFlexCenter" id="chat-header">
+        <div
+          className="chat-header displayFlexCenter"
+          id={`chat-header-${props.roomDetails.roomid}`}
+        >
           <div
             className="person-profile"
             style={{
@@ -291,7 +312,10 @@ function ChatArea(props) {
           })}
         </div>
         {(replyMessage || selectedFile) && (
-          <div className="reply-msg" id="reply-msg">
+          <div
+            className="reply-msg"
+            id={`reply-msg-${props.roomDetails.roomid}`}
+          >
             {selectedFile && (
               <div className="selectedFile-inner-container">
                 {displaySelectedImages()}
@@ -299,6 +323,15 @@ function ChatArea(props) {
             )}
             {replyMessage && (
               <div className="reply-inner-container">
+                <div className="cancel-btn">
+                  <i
+                    className="fa fa-close "
+                    onClick={() => {
+                      setReplyMessage();
+                    }}
+                    aria-hidden="true"
+                  ></i>
+                </div>
                 {replyMessage?.images?.slice(0, 2)?.map((e) => (
                   <img
                     className={"reply-files"}
@@ -321,8 +354,8 @@ function ChatArea(props) {
           </div>
         )}
 
-        <div className="type-area">
-          <label htmlFor="fileInput">
+        <div className="type-area" id={`type-area-${props.roomDetails.roomid}`}>
+          <label htmlFor={`fileInput-${props.roomDetails.roomid}`}>
             <i
               className="fa fa-superpowers other-option"
               aria-hidden="true"
@@ -331,7 +364,7 @@ function ChatArea(props) {
           <input
             onClick={(e) => (e.target.value = "")}
             multiple
-            id="fileInput"
+            id={`fileInput-${props.roomDetails.roomid}`}
             type="file"
             style={{ display: "none" }}
             accept="media_type"
@@ -342,7 +375,7 @@ function ChatArea(props) {
             }}
           ></input>
 
-          <div className="text-area" id="text-area">
+          <div className="text-area">
             <input
               type="text"
               placeholder="type message here"
@@ -399,7 +432,6 @@ export default connect(mapStateToProps, mapDispatchToProps)(ChatArea);
 function Menu(props) {
   return (
     <div
-      id="menu"
       style={{
         justifyContent: "center",
         display: "flex",

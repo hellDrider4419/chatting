@@ -78,6 +78,9 @@ export const initialSlice = createSlice({
         ) {
           state.roomList[index] = {
             ...roomDetails,
+            showroom: roomDetails?.showroom?.includes(action.payload.userid)
+              ? roomDetails.showroom
+              : [...roomDetails.showroom, action.payload.userid],
             messages: roomDetails?.messages
               ? [...roomDetails?.messages, action.payload.message]
               : [action.payload.message],
