@@ -121,15 +121,30 @@ function ChatArea(props) {
     let images = [];
     for (let i = 0; i < selectedFile.length; i++) {
       images.push(
-        <img
-          className={"reply-files"}
-          src={window.URL.createObjectURL(selectedFile[i])}
-          onError={({ currentTarget }) => {
-            currentTarget.onerror = null; // prevents looping
-            currentTarget.src = documentThumbnail;
-          }}
-          alt="media"
-        />
+        <div className="reply-files-container">
+          <img
+            className={"reply-files"}
+            src={window.URL.createObjectURL(selectedFile[i])}
+            onError={({ currentTarget }) => {
+              currentTarget.onerror = null; // prevents looping
+              currentTarget.src = documentThumbnail;
+            }}
+            alt="media"
+          />
+          <div className="cancel-btn">
+            <i
+              className="fa fa-close "
+              onClick={() => {
+                selectedFile?.length > 1
+                  ? setSelectedFile([
+                      ...selectedFile?.filter((e, index) => i != index),
+                    ])
+                  : setSelectedFile();
+              }}
+              aria-hidden="true"
+            ></i>
+          </div>
+        </div>
       );
     }
     return images;
@@ -308,6 +323,15 @@ function ChatArea(props) {
             )}
             {replyMessage && (
               <div className="reply-inner-container">
+                <div className="cancel-btn">
+                  <i
+                    className="fa fa-close "
+                    onClick={() => {
+                      setReplyMessage();
+                    }}
+                    aria-hidden="true"
+                  ></i>
+                </div>
                 {replyMessage?.images?.slice(0, 2)?.map((e) => (
                   <img
                     className={"reply-files"}
