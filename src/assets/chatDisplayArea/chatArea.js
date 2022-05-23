@@ -246,7 +246,8 @@ function ChatArea(props) {
                               }
                             : null,
                         copyOnCLick: () => {
-                          navigator.clipboard.writeText(msg.message);
+                          if (msg.message?.length)
+                            navigator.clipboard.writeText(msg.message);
                         },
                         ReplyOnClick: () => {
                           setReplyMessage(msg);

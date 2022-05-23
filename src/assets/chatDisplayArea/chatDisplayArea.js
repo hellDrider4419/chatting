@@ -26,7 +26,7 @@ class ChatDisplayArea extends React.Component {
     this.tabList = [
       { name: "recent" },
       { name: "add new chat" },
-      { name: "create group" },
+      // { name: "create group" },
     ];
     this.getUserDetails();
   }
