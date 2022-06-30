@@ -21,7 +21,7 @@ class ChatDisplayArea extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      selectedTab: "recent",
+	selectedTab: { name: "recent"},
     };
     this.tabList = [
       { name: "recent" },
@@ -103,11 +103,11 @@ class ChatDisplayArea extends React.Component {
               </div>
             ))}
           </div>
-          {this.state.selectedTab === this.tabList[0].name && <ChatRoomList />}
-          {this.state.selectedTab === this.tabList[1].name && (
+          {this.state.selectedTab === this.tabList[0]?.name && <ChatRoomList />}
+          {this.state.selectedTab === this.tabList[1]?.name && (
             <ContactList handleTabSelection={this.handleTabSelection} />
           )}
-          {this.state.selectedTab === this.tabList[2].name && <ContactList />}
+          {this.state.selectedTab === this.tabList[2]?.name && <ContactList />}
         </div>
         {
           <div
